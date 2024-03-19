@@ -1,12 +1,15 @@
 <div class="search-container">
     <div class="search-bar">
-      <input type="text" placeholder="Enter stock ticker symbol">
+      <input type="text" placeholder="Enter stock ticker symbol" [(ngModel)]="searchQuery" (input)="onInputChange()">
       <button type="button" class="btn btn-primary">
         <fa-icon [icon]="faMagnifyingGlass" style="margin-right: 5px; color: blue;"></fa-icon>
       </button>
       <button type="button" class="btn btn-danger">
         <fa-icon [icon]="faX" style="margin-right: 15px; color: blue;"></fa-icon>
       </button>
+    </div>
+    <div *ngFor="let suggestion of suggestions">
+      {{ suggestion }}
     </div>
   </div>
   

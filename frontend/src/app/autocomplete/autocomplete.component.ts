@@ -1,16 +1,12 @@
 import { Component } from '@angular/core';
-import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
-import { faX } from '@fortawesome/free-solid-svg-icons';
 import { AutocompleteService } from '../autocomplete.service';
 
 @Component({
-  selector: 'app-search-bar',
-  templateUrl: './search-bar.component.html',
-  styleUrls: ['./search-bar.component.css']
+  selector: 'app-autocomplete',
+  templateUrl: './autocomplete.component.html',
+  styleUrls: ['./autocomplete.component.css']
 })
-export class SearchBarComponent {
-  faMagnifyingGlass = faMagnifyingGlass;
-  faX = faX;
+export class AutocompleteComponent {
   searchQuery: string = '';
   suggestions: string[] = [];
 
@@ -19,9 +15,9 @@ export class SearchBarComponent {
   onInputChange(): void {
     this.autocompleteService.getAutocompleteSuggestions(this.searchQuery)
       .subscribe((suggestions: string[]) => {
+        console.log(suggestions); // Log the response to check if suggestions are being received
         this.suggestions = suggestions;
       });
   }
+  
 }
-
-
