@@ -13,6 +13,8 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatIconModule} from '@angular/material/icon';
 
 @NgModule({
   declarations: [
@@ -29,7 +31,9 @@ import { MatInputModule } from '@angular/material/input';
     FontAwesomeModule,
     MatAutocompleteModule,
     MatFormFieldModule,
-    MatInputModule
+    MatInputModule,
+    MatProgressSpinnerModule,
+    MatIconModule
   ],
   providers: [AutocompleteService, provideAnimationsAsync()],
   bootstrap: [AppComponent]

@@ -20,18 +20,25 @@ export class SearchBarComponent {
   faX = faX;
   searchQuery: string = '';
   suggestions: StockSuggestion[] = [];
+  isLoading: boolean = false;
 
   constructor(private autoCompleteService: AutocompleteService) { } // Inject the service
 
   // Method to handle input change
   onInputChange() {
+    this.isLoading = true;
     if (this.searchQuery.trim() !== '') {
       this.autoCompleteService.getAutocompleteSuggestions(this.searchQuery).subscribe(
         (data: any) => {
-          this.suggestions = data.result;
+          //here we can use .filter to filter out according to what was mentioned - only using common stock and no '.' symbol
+          this.suggestions = data.result.filter((suggestion: StockSuggestion) => {
+            return suggestion.type === 'Common Stock' && !suggestion.symbol.includes('.');
+          });
+          this.isLoading = false;
         },
         (error) => {
           console.error(error);
+          this.isLoading = false;
         }
       );
     } else {

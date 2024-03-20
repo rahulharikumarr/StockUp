@@ -1,16 +1,19 @@
 <div class="search-container">
   <div class="search-bar">
-    <input type="text" placeholder="Enter stock ticker symbol" [(ngModel)]="searchQuery" (input)="onInputChange()">
-    <button type="button" class="btn btn-primary">
-      <fa-icon [icon]="faMagnifyingGlass" style="margin-right: 5px; color: blue;"></fa-icon>
+    <input matInput placeholder="Enter stock ticker symbol" [(ngModel)]="searchQuery" (input)="onInputChange()" [matAutocomplete]="auto">
+    <mat-autocomplete #auto="matAutocomplete">
+      <mat-option *ngIf="isLoading" disabled>
+        <mat-spinner diameter="20"></mat-spinner> <!-- Display spinner if loading -->
+      </mat-option>
+      <mat-option *ngFor="let suggestion of suggestions" [value]="suggestion.displaySymbol">
+        {{ suggestion.displaySymbol }} | {{ suggestion.description }}
+      </mat-option>
+    </mat-autocomplete>
+    <button mat-button matSuffix mat-icon-button aria-label="Search" class="search-icon">
+      <fa-icon [icon]="faMagnifyingGlass"></fa-icon>
     </button>
-    <button type="button" class="btn btn-danger">
-      <fa-icon [icon]="faX" style="margin-right: 15px; color: blue;"></fa-icon>
+    <button mat-button matSuffix mat-icon-button aria-label="Clear" (click)="searchQuery = ''">
+      <mat-icon>close</mat-icon>
     </button>
-  </div>
-  <div>
-    <div *ngFor="let suggestion of suggestions">
-      <p>{{ suggestion.displaySymbol }} | {{ suggestion.description }}</p> <!-- Accessing the description property -->
-    </div>
   </div>
 </div>
