@@ -1,0 +1,24 @@
+<app-search-bar [query]="searchQuery"></app-search-bar>
+
+<div class="container">
+  <!-- Display company data below the search bar -->
+  <div>
+    <h1>{{ companyData?.ticker }}</h1>
+    <h2>{{ companyData?.name }}</h2>
+    <p>{{ companyData?.exchange }}</p>
+    <button>Buy</button>
+  </div>
+
+  <div>
+    <img [src]="companyData?.logo" alt="Company Logo">
+    <p *ngIf="marketStatus?.isOpen; else closed">Market open on {{ marketStatus?.t }}</p>
+    <ng-template #closed>Market closed on {{ marketStatus?.t }}</ng-template>
+  </div>
+
+  <div>
+    <p>Last Price: {{ companyData?.lastPrice }}</p>
+    <p>Change: {{ companyData?.change }} <span [class]="companyData?.change < 0 ? 'negative' : 'positive'">{{ companyData?.percentChange }}%</span></p>
+    <p>Date: {{ companyData?.date }}</p>
+    <p>Time: {{ companyData?.time | date: 'mediumTime' }}</p> <!-- Format time using DatePipe -->
+  </div>
+</div>

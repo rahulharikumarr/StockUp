@@ -55,6 +55,20 @@ const getRecommendationTrends = async (req, res) => {
   }
 };
 
+const getMarketStatus = async (req, res) => {
+  try {
+    const { exchange } = req.query;
+    const apiKey = process.env.FINNHUB_API_KEY;
+
+    const response = await axios.get(`https://finnhub.io/api/v1/stock/market-status?exchange=${exchange}&token=${apiKey}`);
+    
+    res.status(200).json(response.data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
 
 // Function to get company insider sentiment
 const getInsiderSentiment = async (req, res) => {
@@ -172,6 +186,7 @@ module.exports = {
   getCompanyProfile,
   getCompanyNews,
   getRecommendationTrends,
+  getMarketStatus,
   getInsiderSentiment,
   getCompanyPeers,
   getCompanyEarnings,

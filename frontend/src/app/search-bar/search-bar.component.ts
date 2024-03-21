@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
-import { faX } from '@fortawesome/free-solid-svg-icons';
 import { AutocompleteService } from '../autocomplete.service'; // Update the path
 
 interface StockSuggestion {
@@ -15,22 +15,37 @@ interface StockSuggestion {
   templateUrl: './search-bar.component.html',
   styleUrls: ['./search-bar.component.css']
 })
-export class SearchBarComponent {
+export class SearchBarComponent implements OnInit {
+  @Input() query: string = ''; // Declare query as an input property
   faMagnifyingGlass = faMagnifyingGlass;
-  faX = faX;
-  searchQuery: string = '';
+  searchQuery: string = ''; // Add searchQuery property
   suggestions: StockSuggestion[] = [];
   isLoading: boolean = false;
 
-  constructor(private autoCompleteService: AutocompleteService) { } // Inject the service
+  constructor(
+    private autoCompleteService: AutocompleteService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {}
+
+  ngOnInit(): void {
+    // Check if the route contains a ticker symbol
+    this.route.paramMap.subscribe(params => {
+      const ticker = params.get('ticker');
+      if (ticker) {
+        // Update searchQuery with ticker if available
+        this.searchQuery = ticker;
+      }
+    });
+  }
 
   // Method to handle input change
   onInputChange() {
     this.isLoading = true;
-    if (this.searchQuery.trim() !== '') {
+    if (this.searchQuery.trim() !== '') { // Use searchQuery instead of query
       this.autoCompleteService.getAutocompleteSuggestions(this.searchQuery).subscribe(
         (data: any) => {
-          //here we can use .filter to filter out according to what was mentioned - only using common stock and no '.' symbol
+          // Filter suggestions based on criteria
           this.suggestions = data.result.filter((suggestion: StockSuggestion) => {
             return suggestion.type === 'Common Stock' && !suggestion.symbol.includes('.');
           });
@@ -44,5 +59,17 @@ export class SearchBarComponent {
     } else {
       this.suggestions = [];
     }
+  }
+
+  // Method to perform search and navigate to search/:ticker route
+  search() {
+    if (this.searchQuery.trim() !== '') { // Use searchQuery instead of query
+      // Redirect to search results page with the entered ticker symbol
+      this.router.navigate(['/search', this.searchQuery.trim()]);
+    }
+  }
+
+  navigateToSymbol(displaySymbol: string): void {
+    this.router.navigate(['/search', displaySymbol.trim()]);
   }
 }

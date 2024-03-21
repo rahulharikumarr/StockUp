@@ -26,4 +26,7 @@ router.get('/company-news', stockControllers.getCompanyNews);
 // Route to get earnings information
 router.get('/earnings', stockControllers.getCompanyEarnings);
 
+// Route to get market status
+router.get('/market-status', stockControllers.getMarketStatus);
+
 module.exports = router;

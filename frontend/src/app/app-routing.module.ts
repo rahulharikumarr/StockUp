@@ -4,11 +4,12 @@ import { HomeComponent } from './home/home.component';
 import { SearchComponent } from './search/search.component';
 import { WatchlistComponent } from './watchlist/watchlist.component';
 import { PortfolioComponent } from './portfolio/portfolio.component';
+import { SearchDetailsComponent } from './search-details/search-details.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/search/home', pathMatch: 'full' },
   { path: 'search/home', component: HomeComponent },
-  { path: 'search/:ticker', component: SearchComponent },
+  { path: 'search/:ticker', component: SearchDetailsComponent },
   { path: 'watchlist', component: WatchlistComponent },
   { path: 'portfolio', component: PortfolioComponent },
   { path: '**', redirectTo: '/search/home' } // Redirect to home if route not found
