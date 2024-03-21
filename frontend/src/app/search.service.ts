@@ -33,4 +33,8 @@ export class StockDataService {
   getMarketStatus(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/market-status?exchange=US`);
   }
+
+  getLatestPrice(symbol: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/latest-price?symbol=${symbol}`);
+  }
 }

@@ -1,24 +1,37 @@
 <app-search-bar [query]="searchQuery"></app-search-bar>
-
 <div class="container">
-  <!-- Display company data below the search bar -->
-  <div>
-    <h1>{{ companyData?.ticker }}</h1>
-    <h2>{{ companyData?.name }}</h2>
-    <p>{{ companyData?.exchange }}</p>
-    <button>Buy</button>
+  <!-- First section -->
+  <div class="column">
+    <div class="company-info">
+      <h1>{{ companyData?.ticker }}</h1>
+      <h2>{{ companyData?.name }}</h2>
+      <p>{{ companyData?.exchange }}</p>
+      <button class="btn btn-success buy-button">Buy</button>
+    </div>
   </div>
 
-  <div>
-    <img [src]="companyData?.logo" alt="Company Logo">
-    <p *ngIf="marketStatus?.isOpen; else closed">Market open on {{ marketStatus?.t }}</p>
-    <ng-template #closed>Market closed on {{ marketStatus?.t }}</ng-template>
+  <!-- Second section -->
+  <div class="column">
+    <div class="company-logo">
+      <img [src]="companyData?.logo" alt="Company Logo">
+    </div>
+    <div class="market-status">
+      <p *ngIf="marketStatus?.isOpen; else closed" class="market-text">Market open on {{ formatDate(marketStatus?.t) }}</p>
+      <ng-template #closed><p class="market-text red">Market closed on {{ formatDate(marketStatus?.t) }}</p></ng-template>
+    </div>
   </div>
 
-  <div>
-    <p>Last Price: {{ companyData?.lastPrice }}</p>
-    <p>Change: {{ companyData?.change }} <span [class]="companyData?.change < 0 ? 'negative' : 'positive'">{{ companyData?.percentChange }}%</span></p>
-    <p>Date: {{ companyData?.date }}</p>
-    <p>Time: {{ companyData?.time | date: 'mediumTime' }}</p> <!-- Format time using DatePipe -->
+  <!-- Third section -->
+  <div class="column">
+    <div class="price-info">
+      <h1>{{ latestPriceData?.pc }}</h1>
+      <div class="change-info">
+        <img [src]="latestPriceData?.d < 0 ? '../../assets/RedArrowDown.png' : '../../assets/GreenArrowUp.png'" alt="Change Arrow">
+        <h2 class="change-value">{{ latestPriceData?.d }}</h2>
+        <h2>{{ latestPriceData?.dp }}%</h2>
+      </div>
+      <p>{{ formatDate(latestPriceData?.t) }}</p>
+      <!-- Use formatDate function to format the date -->
+    </div>
   </div>
 </div>
