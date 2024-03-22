@@ -1,6 +1,12 @@
-<app-search-bar [query]="query" (search)="performSearch()"></app-search-bar>
-<div *ngIf="searchResults">
-  <div *ngFor="let result of searchResults">
-    {{ result | json }}
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8 col-sm-10 col-12">
+      <app-search-bar [query]="query" (search)="performSearch()"></app-search-bar>
+      <div *ngIf="searchResults">
+        <div *ngFor="let result of searchResults">
+          {{ result | json }}
+        </div>
+      </div>
+    </div>
   </div>
 </div>

@@ -15,23 +15,25 @@
     <div class="company-logo">
       <img [src]="companyData?.logo" alt="Company Logo">
     </div>
-    <div class="market-status">
-      <p *ngIf="marketStatus?.isOpen; else closed" class="market-text">Market open on {{ formatDate(marketStatus?.t) }}</p>
-      <ng-template #closed><p class="market-text red">Market closed on {{ formatDate(marketStatus?.t) }}</p></ng-template>
+    <div class="market-status" style = "padding-top: 50px; font-weight: bold;">
+      <p *ngIf="marketStatus?.isOpen; else closed" [style.color]="marketStatus?.isOpen ? 'green' : 'red'">Market is open</p>
+      <ng-template #closed><p [style.color]="'red'">Market closed on {{ formatDate(marketStatus?.t) }}</p></ng-template>
     </div>
   </div>
+  
 
   <!-- Third section -->
   <div class="column">
-    <div class="price-info">
+    <div class="price-info" [ngClass]="{'red': latestPriceData?.d < 0, 'green': latestPriceData?.d >= 0}">
       <h1>{{ latestPriceData?.pc }}</h1>
       <div class="change-info">
         <img [src]="latestPriceData?.d < 0 ? '../../assets/RedArrowDown.png' : '../../assets/GreenArrowUp.png'" alt="Change Arrow">
         <h2 class="change-value">{{ latestPriceData?.d }}</h2>
         <h2>{{ latestPriceData?.dp }}%</h2>
       </div>
-      <p>{{ formatDate(latestPriceData?.t) }}</p>
-      <!-- Use formatDate function to format the date -->
+      <div class="date-time">
+        <p>{{ formatDate(latestPriceData?.t) }}</p>
+      </div>
     </div>
   </div>
 </div>

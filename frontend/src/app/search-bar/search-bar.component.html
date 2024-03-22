@@ -1,22 +1,29 @@
-<div class="container mt-3 text-center">
-  <h1 style="font-weight: 200; font-size: 34px; margin-top: 40px;">STOCK SEARCH</h1>
-</div>
-<div class="search-container">
-  <div class="search-bar">
-    <input matInput placeholder="Enter stock ticker symbol" [(ngModel)]="searchQuery" (input)="onInputChange()" [matAutocomplete]="auto" (keydown.enter)="search()">
-    <mat-autocomplete #auto="matAutocomplete">
-      <mat-option *ngIf="isLoading" disabled>
-        <mat-spinner diameter="20"></mat-spinner> <!-- Display spinner if loading -->
-      </mat-option>
-      <mat-option *ngFor="let suggestion of suggestions" [value]="suggestion.displaySymbol" (click)="navigateToSymbol(suggestion.displaySymbol)">
-        {{ suggestion.displaySymbol }} | {{ suggestion.description }}
-      </mat-option>
-    </mat-autocomplete>
-    <button mat-button matSuffix mat-icon-button aria-label="Search" class="search-icon" (click)="search()">
-      <fa-icon [icon]="faMagnifyingGlass"></fa-icon>
-    </button>
-    <button mat-button matSuffix mat-icon-button aria-label="Clear" (click)="searchQuery = ''">
-      <mat-icon>close</mat-icon>
-    </button>
+<!-- search-bar.component.html -->
+<div class="container mt-3">
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+      <div class="text-center">
+        <h1 style="font-weight: 200; font-size: 34px;">STOCK SEARCH</h1>
+      </div>
+      <div class="search-container">
+        <div class="search-bar">
+          <input matInput placeholder="Enter stock ticker symbol" [(ngModel)]="searchQuery" (input)="onInputChange()" [matAutocomplete]="auto" (keydown.enter)="search()">
+          <mat-autocomplete #auto="matAutocomplete">
+            <mat-option *ngIf="isLoading" disabled>
+              <mat-spinner diameter="20"></mat-spinner> <!-- Display spinner if loading -->
+            </mat-option>
+            <mat-option *ngFor="let suggestion of suggestions" [value]="suggestion.displaySymbol" (click)="navigateToSymbol(suggestion.displaySymbol)">
+              {{ suggestion.displaySymbol }} | {{ suggestion.description }}
+            </mat-option>
+          </mat-autocomplete>
+          <button mat-button matSuffix mat-icon-button aria-label="Search" class="search-icon" (click)="search()">
+            <fa-icon [icon]="faMagnifyingGlass"></fa-icon>
+          </button>
+          <button mat-button matSuffix mat-icon-button aria-label="Clear" (click)="searchQuery = ''">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

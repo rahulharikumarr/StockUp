@@ -1,0 +1,28 @@
+.navbar-nav .nav-item.active .nav-link {
+    outline: 1px solid white;
+    border-width: 15px;
+    border-radius: 6px;
+  }
+  
+  /* No media queries, adjust styles directly */
+  .navbar-nav .nav-link {
+    width: auto; /* Reset button width */
+  }
+  
+  .navbar-collapse.show .navbar-nav {
+    width: 100%; /* Make buttons span full width */
+    justify-content: center; /* Center buttons horizontally */
+  }
+  
+  .navbar-collapse.show .nav-item {
+    margin: 0 30px; /* Add margin to separate buttons */
+  }
+  
+  .navbar-collapse.show .nav-link {
+    width: 100%; /* Adjust button width as needed */
+    text-align: left; /* Center text inside buttons */
+    padding-left: 20px;
+  }
+  .navbar-collapse.show .nav-item:first-child .nav-link {
+    margin-top: 30px;
+  }
