@@ -1,62 +1,32 @@
 .container {
-    display: flex;
-    justify-content: center;
-    padding-top: 25px;
-  }
-  
-  .column {
-    flex: 1;
-    margin: 0 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .company-info {
-    text-align: center;
-  }
-  
-  .company-logo img {
-    width: 100px; /* Adjust as needed */
-  }
-  
-  .market-status {
-    margin-top: 20px;
-    text-align: center;
-  }
-  
-  .price-info {
-    text-align: center;
-  }
-  
-  .change-info {
-    display: flex;
-    align-items: center;
-  }
-  
-  .change-info img {
-    max-width: 24px; /* Adjust as needed */
-    max-height: 24px; /* Adjust as needed */
-    margin-right: 10px;
-  }
-  
-  .date-time {
-    color: #6c757d; /* Gray color for date time */
-  }
-  
-  .green {
-    color: green;
-  }
-  
-  .red {
-    color: red;
-  }
-  
-  .red img {
-    filter: brightness(0.7); /* Apply filter to make image darker when change is negative */
-  }
+  padding-top: 20px;
+}
 
-  .green img {
-    filter: brightness(0.7);
-  }
-  
+.change-info {
+  display: flex;
+  align-items: center; /* Align items vertically */
+}
+/* Colors */
+.green {
+  color: green;
+}
+
+.company-logo img {
+  max-width: 120px; /* Adjust the width as needed */
+  max-height: auto; /* Maintain aspect ratio */
+}
+
+
+.arrow {
+  max-width: 16px;
+  max-height: 16px;
+}
+
+.red {
+  color: red;
+}
+
+.red img,
+.green img {
+  filter: brightness(0.7);
+}

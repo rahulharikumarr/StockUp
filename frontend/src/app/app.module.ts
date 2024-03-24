@@ -16,6 +16,9 @@ import { MatInputModule } from '@angular/material/input';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatIconModule} from '@angular/material/icon';
 import { SearchDetailsComponent } from './search-details/search-details.component';
+import { SearchResultService } from './search-results.service';
+import { TabGroupComponent } from './tab-group/tab-group.component';
+import { MatTabsModule } from '@angular/material/tabs';
 
 @NgModule({
   declarations: [
@@ -23,7 +26,8 @@ import { SearchDetailsComponent } from './search-details/search-details.componen
     SearchBarComponent,
     HomeComponent,
     AutocompleteComponent,
-    SearchDetailsComponent
+    SearchDetailsComponent,
+    TabGroupComponent
   ],
   imports: [
     BrowserModule,
@@ -35,9 +39,10 @@ import { SearchDetailsComponent } from './search-details/search-details.componen
     MatFormFieldModule,
     MatInputModule,
     MatProgressSpinnerModule,
-    MatIconModule
+    MatIconModule,
+    MatTabsModule
   ],
-  providers: [AutocompleteService, provideAnimationsAsync()],
+  providers: [AutocompleteService, provideAnimationsAsync(), SearchResultService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

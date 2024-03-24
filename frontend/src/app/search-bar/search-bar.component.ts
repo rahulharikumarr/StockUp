@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { AutocompleteService } from '../autocomplete.service'; // Update the path
+import { SearchResultService } from '../search-results.service';
 
 interface StockSuggestion {
   description: string;
@@ -25,7 +26,8 @@ export class SearchBarComponent implements OnInit {
   constructor(
     private autoCompleteService: AutocompleteService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private searchResultService: SearchResultService // Inject the SearchResultService
   ) {}
 
   ngOnInit(): void {
@@ -64,6 +66,8 @@ export class SearchBarComponent implements OnInit {
   // Method to perform search and navigate to search/:ticker route
   search() {
     if (this.searchQuery.trim() !== '') { // Use searchQuery instead of query
+      // Set the last searched ticker
+      this.searchResultService.setLastSearchedTicker(this.searchQuery.trim());
       // Redirect to search results page with the entered ticker symbol
       this.router.navigate(['/search', this.searchQuery.trim()]);
     }

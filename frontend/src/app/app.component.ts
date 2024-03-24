@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router, NavigationEnd } from '@angular/router';
+import { SearchResultService } from './search-results.service';
 
 @Component({
   selector: 'app-root',
@@ -7,14 +7,15 @@ import { Router, NavigationEnd } from '@angular/router';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  showSearchBar: boolean = false;
+  constructor(public searchResultService: SearchResultService) {}
 
-  constructor(private router: Router) {
-    this.router.events.subscribe(event => {
-      if (event instanceof NavigationEnd) {
-        // Check if the current route is a search route
-        this.showSearchBar = event.url.startsWith('/search');
-      }
-    });
+  getSearchLink(): string {
+    const lastSearchedTicker = this.searchResultService.getLastSearchedTicker();
+    if (lastSearchedTicker) {
+      return '/search/' + lastSearchedTicker;
+    } else {
+      // If no last searched ticker is available, fallback to the default search route
+      return '/search';
+    }
   }
 }

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { StockDataService } from '../search.service';
+import { SearchResultService } from '../search-results.service';
 
 @Component({
   selector: 'app-search-details',
@@ -16,38 +17,44 @@ export class SearchDetailsComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private stockDataService: StockDataService
+    private stockDataService: StockDataService,
+    private searchResultService: SearchResultService
   ) {}
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       this.ticker = params['ticker'];
-      this.searchQuery = this.stockDataService.getSearchQuery(); // Get the search query
-      this.loadCompanyData();
-      this.loadMarketStatus();
-      this.loadLatestPrice();
+      this.searchQuery = this.stockDataService.getSearchQuery();
+
+      const storedData = this.searchResultService.getSearchResults(this.ticker);
+      if (storedData) {
+        this.companyData = storedData.companyData;
+        this.marketStatus = storedData.marketStatus;
+        this.latestPriceData = storedData.latestPriceData;
+      } else {
+        this.loadData();
+        console.log('fetched from the backend lol');
+      }
     });
   }
 
-  loadCompanyData(): void {
-    this.stockDataService.getCompanyData(this.ticker).subscribe(data => {
-      this.companyData = data;
+  loadData(): void {
+    this.stockDataService.getCompanyData(this.ticker).subscribe(companyData => {
+      this.companyData = companyData;
+      this.stockDataService.getMarketStatus().subscribe(marketStatus => {
+        this.marketStatus = marketStatus;
+        this.stockDataService.getLatestPrice(this.ticker).subscribe(latestPriceData => {
+          this.latestPriceData = latestPriceData;
+          this.searchResultService.storeSearchResults(this.ticker, {
+            companyData: this.companyData,
+            marketStatus: this.marketStatus,
+            latestPriceData: this.latestPriceData
+          });
+        });
+      });
     });
   }
 
-  loadMarketStatus(): void {
-    this.stockDataService.getMarketStatus().subscribe(data => {
-      this.marketStatus = data;
-    });
-  }
-
-  loadLatestPrice(): void {
-    this.stockDataService.getLatestPrice(this.ticker).subscribe(data => {
-      this.latestPriceData = data;
-    });
-  }
-
-  // Function to format date
   formatDate(date: any): string {
     const formattedDate = new Date(date * 1000);
     const year = formattedDate.getFullYear();
