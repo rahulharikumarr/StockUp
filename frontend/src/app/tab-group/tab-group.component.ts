@@ -22,9 +22,15 @@ export class TabGroupComponent implements OnInit {
   }
 
   fetchData(): void {
-    const symbol = this.stockDataService.getSearchQuery();
+    const lastSearchedTicker = this.searchResultService.getLastSearchedTicker();
+    console.log('Last Searched Ticker:', lastSearchedTicker); // Debugging
 
-    this.stockDataService.getCompanyData(symbol).subscribe(
+    if (!lastSearchedTicker) {
+      console.error('No ticker symbol found.');
+      return;
+    }
+
+    this.stockDataService.getCompanyData(lastSearchedTicker).subscribe(
       (companyData: any) => {
         console.log('Company Data:', companyData);
         this.companyData = companyData;
@@ -35,7 +41,7 @@ export class TabGroupComponent implements OnInit {
       }
     );
 
-    this.stockDataService.getLatestPrice(symbol).subscribe(
+    this.stockDataService.getLatestPrice(lastSearchedTicker).subscribe(
       (latestPriceData: any) => {
         console.log('Latest Price Data:', latestPriceData);
         this.latestPriceData = latestPriceData;
@@ -46,7 +52,7 @@ export class TabGroupComponent implements OnInit {
       }
     );
 
-    this.stockDataService.getCompanyPeers(symbol).subscribe(
+    this.stockDataService.getCompanyPeers(lastSearchedTicker).subscribe(
       (companyPeers: any) => {
         console.log('Company Peers:', companyPeers);
         this.companyPeers = companyPeers;

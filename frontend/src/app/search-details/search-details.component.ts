@@ -26,7 +26,8 @@ export class SearchDetailsComponent implements OnInit {
     this.route.params.subscribe(params => {
       this.ticker = params['ticker'];
       this.searchQuery = this.stockDataService.getSearchQuery();
-
+      this.searchResultService.setLastSearchedTicker(this.ticker);
+      
       const storedData = this.searchResultService.getSearchResults(this.ticker);
       if (storedData) {
         this.companyData = storedData.companyData;
