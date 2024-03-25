@@ -19,6 +19,7 @@ import { SearchDetailsComponent } from './search-details/search-details.componen
 import { SearchResultService } from './search-results.service';
 import { TabGroupComponent } from './tab-group/tab-group.component';
 import { MatTabsModule } from '@angular/material/tabs';
+import { StockDataService } from './search.service';
 
 @NgModule({
   declarations: [
@@ -42,7 +43,7 @@ import { MatTabsModule } from '@angular/material/tabs';
     MatIconModule,
     MatTabsModule
   ],
-  providers: [AutocompleteService, provideAnimationsAsync(), SearchResultService],
+  providers: [AutocompleteService, provideAnimationsAsync(), SearchResultService, StockDataService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

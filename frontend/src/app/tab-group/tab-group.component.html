@@ -3,11 +3,43 @@
 <mat-tab-group class = "custom-tab-group">
     <!-- Summary Tab -->
     <mat-tab label="Summary">
-      <ng-template matTabContent>
-        <!-- Content for the Summary tab goes here -->
-        <p>Summary Content</p>
-      </ng-template>
-    </mat-tab>
+        <ng-template matTabContent>
+          <div class="container">
+            <!-- Left Section -->
+            <div class="row">
+              <div class="col">
+                <p>High Price: {{ latestPriceData?.h }}</p>
+                <p>Low Price: {{ latestPriceData?.l }}</p>
+                <p>Open Price: {{ latestPriceData?.o }}</p>
+                <p>Previous Close: {{ latestPriceData?.pc }}</p>
+              </div>
+            </div>
+    
+            <!-- Right Section -->
+            <div class="row">
+              <div class="col">
+                <h3>About the Company</h3>
+                <p>IPO Start Date: {{ companyData?.ipo }}</p>
+                <p>Industry: {{ companyData?.finnhubIndustry }}</p>
+                <p>Webpage: <a href="{{ companyData?.weburl }}" target="_blank">{{ companyData?.weburl }}</a></p>
+                <h4>Company Peers</h4>
+                <ul>
+                  <li *ngFor="let peer of companyPeers">
+                    <a [routerLink]="['/search', peer]">{{ peer }}</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+    
+            <!-- Chart Section (Placeholder) -->
+            <div class="row">
+              <div class="col">
+                <!-- Placeholder for Highcharts chart -->
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </mat-tab>
   
     <!-- Top News Tab -->
     <mat-tab label="Top News">

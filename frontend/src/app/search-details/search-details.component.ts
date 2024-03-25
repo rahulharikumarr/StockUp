@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { StockDataService } from '../search.service';
 import { SearchResultService } from '../search-results.service';
 
+
 @Component({
   selector: 'app-search-details',
   templateUrl: './search-details.component.html',

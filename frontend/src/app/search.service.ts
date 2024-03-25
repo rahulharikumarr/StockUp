@@ -34,7 +34,20 @@ export class StockDataService {
     return this.http.get<any>(`${this.apiUrl}/market-status?exchange=US`);
   }
 
+  // Method to get latest price
   getLatestPrice(symbol: string): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/latest-price?symbol=${symbol}`);
+  }
+
+  // Method to get company peers
+  getCompanyPeers(symbol: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/peers?symbol=${symbol}`);
+  }
+
+  // Method to get company historical data
+  getCompanyHistoricalData(symbol: string): Observable<any> {
+    // Implement the logic to fetch historical data
+    // You may need to provide additional parameters such as from date and to date
+    return this.http.get<any>(`${this.apiUrl}/historical?stockTicker=${symbol}`);
   }
 }
