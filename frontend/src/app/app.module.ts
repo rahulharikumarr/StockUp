@@ -20,6 +20,8 @@ import { SearchResultService } from './search-results.service';
 import { TabGroupComponent } from './tab-group/tab-group.component';
 import { MatTabsModule } from '@angular/material/tabs';
 import { StockDataService } from './search.service';
+import { HighchartsChartModule } from 'highcharts-angular';
+
 
 @NgModule({
   declarations: [
@@ -41,7 +43,8 @@ import { StockDataService } from './search.service';
     MatInputModule,
     MatProgressSpinnerModule,
     MatIconModule,
-    MatTabsModule
+    MatTabsModule,
+    HighchartsChartModule
   ],
   providers: [AutocompleteService, provideAnimationsAsync(), SearchResultService, StockDataService],
   bootstrap: [AppComponent]

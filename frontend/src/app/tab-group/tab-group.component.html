@@ -1,68 +1,86 @@
 <!-- tab-group.component.html -->
 
-<mat-tab-group class = "custom-tab-group">
-    <!-- Summary Tab -->
-    <mat-tab label="Summary">
-        <ng-template matTabContent>
-          <div class="container">
-            <!-- Left Section -->
-            <div class="row">
-              <div class="col">
-                <p>High Price: {{ latestPriceData?.h }}</p>
-                <p>Low Price: {{ latestPriceData?.l }}</p>
-                <p>Open Price: {{ latestPriceData?.o }}</p>
-                <p>Previous Close: {{ latestPriceData?.pc }}</p>
-              </div>
+<mat-tab-group class="custom-tab-group">
+  <!-- Summary Tab -->
+  <mat-tab label="Summary">
+    <ng-template matTabContent>
+      <div class="container" style="padding-top: 40px;">
+        <div class="row">
+          <!-- Left Half for Large Screens -->
+          <div class="col-lg-6 col-12">
+            <!-- Price Descriptions Section -->
+            <div class="text-left mb-4">
+              <p><b>High Price:</b> {{ latestPriceData?.h }}</p>
+              <p><b>Low Price:</b> {{ latestPriceData?.l }}</p>
+              <p><b>Open Price:</b> {{ latestPriceData?.o }}</p>
+              <p><b>Previous Close:</b> {{ latestPriceData?.pc }}</p>
             </div>
-    
-            <!-- Right Section -->
-            <div class="row">
-              <div class="col">
-                <h3>About the Company</h3>
-                <p>IPO Start Date: {{ companyData?.ipo }}</p>
-                <p>Industry: {{ companyData?.finnhubIndustry }}</p>
-                <p>Webpage: <a href="{{ companyData?.weburl }}" target="_blank">{{ companyData?.weburl }}</a></p>
-                <h4>Company Peers</h4>
-                <ul>
-                  <li *ngFor="let peer of companyPeers">
-                    <a [routerLink]="['/search', peer]">{{ peer }}</a>
-                  </li>
-                </ul>
-              </div>
+
+            <!-- About the Company Section -->
+            <div class="text-center mb-4">
+              <h3><b><u>About the Company</u></b></h3>
+              <p><b>IPO Start Date:</b> {{ companyData?.ipo }}</p>
+              <p><b>Industry:</b> {{ companyData?.finnhubIndustry }}</p>
+              <p><b>Webpage: </b><a [href]="companyData?.weburl" target="_blank">{{ companyData?.weburl }}</a></p>
             </div>
-    
-            <!-- Chart Section (Placeholder) -->
-            <div class="row">
-              <div class="col">
-                <!-- Placeholder for Highcharts chart -->
+
+            <!-- Company Peers Section -->
+            <div class="text-center">
+              <h4><b>Company Peers</b></h4>
+              <div class="d-flex flex-wrap justify-content-center">
+                <div *ngFor="let peer of companyPeers" class="mr-2 mb-2">
+                  <a [routerLink]="['/search', peer]">{{ peer }}</a>
+                </div>
               </div>
             </div>
           </div>
-        </ng-template>
-      </mat-tab>
-  
-    <!-- Top News Tab -->
-    <mat-tab label="Top News">
-      <ng-template matTabContent>
-        <!-- Content for the Top News tab goes here -->
-        <p>Top News Content</p>
-      </ng-template>
-    </mat-tab>
-  
-    <!-- Charts Tab -->
-    <mat-tab label="Charts">
-      <ng-template matTabContent>
-        <!-- Content for the Charts tab goes here -->
-        <p>Charts Content</p>
-      </ng-template>
-    </mat-tab>
-  
-    <!-- Insights Tab -->
-    <mat-tab label="Insights">
-      <ng-template matTabContent>
-        <!-- Content for the Insights tab goes here -->
-        <p>Insights Content</p>
-      </ng-template>
-    </mat-tab>
-  </mat-tab-group>
-  
+
+          <!-- Right Half for Large Screens -->
+          <div class="col-lg-6 col-12">
+            <!-- Placeholder for Chart -->
+            <div class="text-center" style="width: 100%; height: 400px;">
+              <highcharts-chart
+  [Highcharts]="Highcharts"
+
+  [constructorType]="chartConstructor"
+  [options]="chartOptions"
+  [callbackFunction]="chartCallback"
+
+  [(update)]="updateFlag"
+  [oneToOne]="oneToOneFlag"
+  [runOutsideAngular]="runOutsideAngular"
+
+  style="width: 100%; height: 400px; display: block;"
+></highcharts-chart>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </mat-tab>
+
+  <!-- Top News Tab -->
+  <mat-tab label="Top News">
+    <ng-template matTabContent>
+      <!-- Content for the Top News tab goes here -->
+      <p>Top News Content</p>
+    </ng-template>
+  </mat-tab>
+
+  <!-- Charts Tab -->
+  <mat-tab label="Charts">
+    <ng-template matTabContent>
+      <div class="text-center" style="width: 100%; height: 400px;">
+
+      </div>
+    </ng-template>
+  </mat-tab>
+
+  <!-- Insights Tab -->
+  <mat-tab label="Insights">
+    <ng-template matTabContent>
+      <!-- Content for the Insights tab goes here -->
+      <p>Insights Content</p>
+    </ng-template>
+  </mat-tab>
+</mat-tab-group>

@@ -1,8 +1,9 @@
+// search-details.component.ts
+
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { StockDataService } from '../search.service';
 import { SearchResultService } from '../search-results.service';
-
 
 @Component({
   selector: 'app-search-details',
@@ -15,6 +16,7 @@ export class SearchDetailsComponent implements OnInit {
   marketStatus: any;
   latestPriceData: any;
   searchQuery: string = '';
+  isStarFilled: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -38,6 +40,9 @@ export class SearchDetailsComponent implements OnInit {
         console.log('fetched from the backend lol');
       }
     });
+
+    // Check market status when component initializes
+    this.checkMarketStatus();
   }
 
   loadData(): void {
@@ -58,13 +63,54 @@ export class SearchDetailsComponent implements OnInit {
   }
 
   formatDate(date: any): string {
-    const formattedDate = new Date(date * 1000);
+    if (!date) {
+      return 'Unknown'; // Return a default value for null or undefined dates
+    }
+  
+    // Convert the provided timestamp to a Date object
+    const formattedDate = new Date(date);
+  
+    // Extract year, month, and day components
     const year = formattedDate.getFullYear();
     const month = ('0' + (formattedDate.getMonth() + 1)).slice(-2);
     const day = ('0' + formattedDate.getDate()).slice(-2);
-    const hours = ('0' + formattedDate.getHours()).slice(-2);
-    const minutes = ('0' + formattedDate.getMinutes()).slice(-2);
-    const seconds = ('0' + formattedDate.getSeconds()).slice(-2);
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  
+    // Return the formatted date
+    return `${year}-${month}-${day} 13:00:00`; // Market always closes at 1:00 PM
+  }
+
+  toggleStar(): void {
+    this.isStarFilled = !this.isStarFilled;
+  }
+  
+  
+  checkMarketStatus(): void {
+    const now = new Date(); // Current date and time
+    const currentHour = now.getHours();
+    const currentMinutes = now.getMinutes();
+  
+    // Convert current time to minutes
+    const currentTimeInMinutes = currentHour * 60 + currentMinutes;
+  
+    // Market open 6:30AM PST, market close 1PM PST
+    const marketOpenTime = 6 * 60 + 30; // 6:30 AM converted to minutes
+    const marketCloseTime = 13 * 60; // 1:00 PM converted to minutes
+  
+    if (currentTimeInMinutes >= marketOpenTime && currentTimeInMinutes <= marketCloseTime) {
+      // Market is open
+      this.marketStatus = { isOpen: true };
+    } else {
+      // Market is closed
+      // Calculate the timestamp for the last market close date (yesterday)
+      const lastCloseDate = new Date(now); // Create a copy of the current date and time
+      if (currentTimeInMinutes < marketOpenTime) {
+        // If the current time is before the opening time, consider the previous day's closing time
+        lastCloseDate.setDate(now.getDate() - 1); // Set the date to the previous day
+      }
+      lastCloseDate.setHours(13, 0, 0); // Set hours and minutes to 1:00 PM
+  
+      // Assign the last close date to marketStatus.closingTime
+      this.marketStatus = { isOpen: false, closingTime: lastCloseDate };
+    }
   }
 }
