@@ -1,9 +1,26 @@
 // tab-group.component.ts
-
 import { Component, OnInit } from '@angular/core';
 import { StockDataService } from '../search.service';
 import { SearchResultService } from '../search-results.service';
 import * as Highcharts from 'highcharts';
+import HighchartsMore from 'highcharts/highcharts-more';
+import HighchartsStock from 'highcharts/modules/stock';
+import HighchartsExporting from 'highcharts/modules/exporting';
+import HighchartsAccessibility from 'highcharts/modules/accessibility';
+import { catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { Options } from 'highcharts';
+import HighchartsIndicators from 'highcharts/indicators/indicators'; // Import the 'highcharts-indicators' module
+import HighchartsVbp from 'highcharts/indicators/volume-by-price';
+
+// ...
+
+
+
+
+
 
 @Component({
   selector: 'app-tab-group',
@@ -23,13 +40,21 @@ export class TabGroupComponent implements OnInit {
   updateFlag: boolean = false; // optional boolean
   oneToOneFlag: boolean = true; // optional boolean, defaults to false
   runOutsideAngular: boolean = false; // optional boolean, defaults to false
+  chartOptionsSMAVolumeByPrice: Highcharts.Options = {};
 
-  constructor(private stockDataService: StockDataService, private searchResultService: SearchResultService) { }
+  constructor(private stockDataService: StockDataService, private searchResultService: SearchResultService) {
+    HighchartsStock(Highcharts);
+    HighchartsIndicators(Highcharts);
+    HighchartsVbp(Highcharts);
+  }
 
   ngOnInit(): void {
     this.lastSearchedTicker = this.searchResultService.getLastSearchedTicker();
     console.log('Last Searched Ticker:', this.lastSearchedTicker); // Debugging
     this.fetchData();
+    this.generateChartSMAVolumeByPrice().subscribe((chartOptions: Highcharts.Options) => {
+      this.chartOptionsSMAVolumeByPrice = chartOptions;
+    });
   }
 
   fetchData(): void {
@@ -100,7 +125,6 @@ export class TabGroupComponent implements OnInit {
     // Fetch historical data for the last working day
     this.stockDataService.getCompanyHistoricalDataLastWorkingDay(this.lastSearchedTicker).subscribe(
       (response: any) => {
-        console.log('Historical Data:', response);
         
         // Extract results array from response
         const historicalData = response.results;
@@ -115,9 +139,6 @@ export class TabGroupComponent implements OnInit {
           return formattedHour;
         });
         const stockPrices = historicalData.map((entry: any) => entry.c); // Assuming 'close' prices are used
-        
-        console.log('Time Labels:', timeLabels);
-        console.log('Stock Prices:', stockPrices);
   
         // Determine line color based on market open/close status
         const lineColor = isMarketOpen ? 'green' : 'red';
@@ -156,8 +177,7 @@ export class TabGroupComponent implements OnInit {
             }
         }]
         };
-  
-        console.log('Chart Options:', this.chartOptions); // Log chart options
+
       },
       (error: any) => {
         console.error('Error fetching historical data:', error);
@@ -165,4 +185,146 @@ export class TabGroupComponent implements OnInit {
     );
   }
 
+  generateChartSMAVolumeByPrice(): Observable<Options> {
+    return this.stockDataService.getCompanyHistoricalDataLastTwoYears(this.lastSearchedTicker).pipe(
+        map((response: any) => {
+            const ohlcData = response.results.map((entry: any) => [
+                entry.t, // timestamp
+                entry.o, // open
+                entry.h, // high
+                entry.l, // low
+                entry.c  // close
+            ]);
+
+            const volumeData = response.results.map((entry: any) => [
+                entry.t, // timestamp
+                entry.v  // volume
+            ]);
+
+            const options: Options = {
+              chart: {
+                    height: 600 // Increase the height to 600 pixels
+                },
+                rangeSelector: {
+                    enabled: true,
+                    selected: 2,
+                    buttons: [{
+                        type: 'month',
+                        count: 1,
+                        text: '1M'
+                    }, {
+                        type: 'month',
+                        count: 3,
+                        text: '3M'
+                    }, {
+                        type: 'month',
+                        count: 6,
+                        text: '6M'
+                    }, {
+                        type: 'ytd',
+                        text: 'YTD'
+                    }, {
+                        type: 'day',
+                        count: 1,
+                        text: '1D'
+                    }, {
+                        type: 'all',
+                        text: 'All'
+                    }]
+                },
+                navigator: {
+                    enabled: true
+                },
+                title: {
+                    text: `${this.lastSearchedTicker} Historical`
+                },
+                subtitle: {
+                    text: 'With SMA and Volume by Price technical indicators'
+                },
+                yAxis: [{
+                    startOnTick: false,
+                    endOnTick: false,
+                    labels: {
+                        align: 'right',
+                        x: -3
+                    },
+                    title: {
+                        text: 'OHLC'
+                    },
+                    height: '60%',
+                    lineWidth: 2,
+                    resize: {
+                        enabled: true
+                    }
+                }, {
+                    labels: {
+                        align: 'right',
+                        x: -3
+                    },
+                    title: {
+                        text: 'Volume'
+                    },
+                    top: '65%',
+                    height: '35%',
+                    offset: 0,
+                    lineWidth: 2
+                }],
+                tooltip: {
+                    split: true
+                },
+                plotOptions: {
+                    series: {
+                        dataGrouping: {
+                            units: [
+                                ['week', [1]],
+                                ['month', [1, 2, 3, 4, 6]]
+                            ]
+                        }
+                    }
+                },
+                series: [{
+                    type: 'candlestick',
+                    name: `${this.lastSearchedTicker}`,
+                    id: 'aapl',
+                    zIndex: 2,
+                    data: ohlcData
+                }, {
+                    type: 'column',
+                    name: 'Volume',
+                    id: 'volume',
+                    data: volumeData,
+                    yAxis: 1
+                }, {
+                    type: 'vbp',
+                    linkedTo: 'aapl',
+                    params: {
+                        volumeSeriesID: 'volume'
+                    },
+                    dataLabels: {
+                        enabled: false
+                    },
+                    zoneLines: {
+                        enabled: false
+                    }
+                }, {
+                    type: 'sma',
+                    linkedTo: 'aapl',
+                    zIndex: 1,
+                    marker: {
+                        enabled: false
+                    }
+                }]
+            };
+
+            return options;
+        })
+    );
 }
+
+
+
+
+
+
+
+  }

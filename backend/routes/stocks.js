@@ -8,6 +8,9 @@ router.get('/profile', stockControllers.getCompanyProfile);
 // Route to get company historical data
 router.get('/historical', stockControllers.getCompanyHistoricalData);
 
+router.get('/historical-last-two-years', stockControllers.getCompanyHistoricalDataLastTwoYears);
+
+
 // Route to get latest stock price
 router.get('/latest-price', stockControllers.getLatestStockPrice);
 

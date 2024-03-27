@@ -164,6 +164,34 @@ const getCompanyHistoricalData = async (req, res) => {
   }
 };
 
+const getCompanyHistoricalDataLastTwoYears = async (req, res) => {
+  try {
+    const { stockTicker } = req.query;
+    
+    // Calculate the date two years ago from the current date
+    const twoYearsAgo = DateTime.local().minus({ years: 2 }).toISODate();
+    const toDate = DateTime.local().toISODate(); // Define toDate here
+
+    const apiKey = process.env.POLYGON_API_KEY;
+    
+    // Construct the query string
+    const queryString = `adjusted=true&sort=asc&apiKey=${apiKey}`;
+    
+    // Construct the API endpoint URL
+    const endpoint = `https://api.polygon.io/v2/aggs/ticker/${stockTicker}/range/1/day/${twoYearsAgo}/${toDate}?${queryString}`;
+    
+    // Make the HTTP request to the Polygon API
+    const response = await axios.get(endpoint);
+    
+    // Send the response data back to the client
+    res.status(200).json(response.data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+
 
 
 
@@ -210,8 +238,7 @@ module.exports = {
   getCompanyHistoricalData,
   getLatestStockPrice,
   autocompleteSearch,
-
-  // Add more functions as needed
+  getCompanyHistoricalDataLastTwoYears
 };
 
 
