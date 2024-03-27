@@ -117,21 +117,34 @@ const getCompanyEarnings = async (req, res) => {
 };
 
 
-
-
-// Function to get company historical data
 const getCompanyHistoricalData = async (req, res) => {
   try {
     const { stockTicker } = req.query;
     const multiplier = 1;
-    const timespan = 'day';
-    
-    // Calculate the from date (6 months and 1 day prior to the current date)
-    const fromDate = DateTime.local().minus({ months: 6, days: 1 }).toISODate();
-    
-    // Calculate the to date (current date)
-    const toDate = DateTime.local().toISODate();
-    
+    const timespan = 'hour';
+
+    // Get the current date and time in UTC
+    const now = DateTime.local().toUTC();
+
+    let fromDate, toDate;
+
+    // Check if today is a weekend or Monday (market closed)
+    if (now.weekday === 6 || now.weekday === 7 || now.weekday === 1) {
+      // If it's a weekend or Monday, set from date to the previous Friday
+      fromDate = now.minus({ days: now.weekday === 1 ? 3 : 2 }).toISODate();
+      toDate = now.toISODate(); // To date is the current date
+    } else {
+      // If it's a weekday (Tuesday to Friday, market open)
+      if ((now.hour === 6 && now.minute >= 30) || (now.hour > 6 && now.hour < 13)) {
+        // Market is open, show variation from the previous day to the current day
+        fromDate = now.minus({ days: 1 }).toISODate();
+      } else {
+        // Market is closed, show variation from one day before closing to the closing date
+        fromDate = now.minus({ days: 2 }).toISODate();
+      }
+      toDate = now.toISODate(); // To date is the current date
+    }
+
     const apiKey = process.env.POLYGON_API_KEY;
     
     // Construct the query string
@@ -150,6 +163,10 @@ const getCompanyHistoricalData = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+
+
+
 
 // Function to get company latest price
 const getLatestStockPrice = async (req, res) => {

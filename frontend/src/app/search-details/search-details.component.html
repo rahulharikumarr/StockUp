@@ -14,16 +14,21 @@
       </div>
     </div>
 
-    <!-- Second section -->
-    <div class="col">
-      <div class="company-logo text-center">
-        <img [src]="companyData?.logo" alt="Company Logo" class="img-fluid">
-      </div>
-      <div class="market-status text-center" style="padding-top: 80px; font-weight: bold;">
-        <p *ngIf="marketStatus?.isOpen; else closed" [style.color]="marketStatus?.isOpen ? 'green' : 'red'">Market is open</p>
-        <ng-template #closed><p [style.color]="'red'">Market closed on {{ formatDate(marketStatus?.closingTime) }}</p></ng-template>
-      </div>
-    </div>
+   <!-- Second section -->
+<div class="col">
+  <div class="company-logo text-center">
+    <img [src]="companyData?.logo" alt="Company Logo" class="img-fluid">
+  </div>
+  <div class="market-status text-center" style="padding-top: 80px; font-weight: bold;">
+    <ng-container *ngIf="isMarketOpen; else closed">
+      <p style="color: green">Market is open</p>
+    </ng-container>
+    <ng-template #closed>
+      <p style="color: red">Market closed on {{ marketClosingTime }}</p>
+    </ng-template>
+  </div>
+</div>
+
 
     <!-- Third section -->
     <div class="col">
@@ -41,10 +46,10 @@
           </div>
         </div>
         <div class="date-time" style="color: #6c757d;">
-          <p>{{ formatDate(latestPriceData?.t) }}</p>
-        </div>
+          <p>{{ formatTimestamp(latestPriceData?.t) }}</p>
+        </div>        
       </div>
-    </div>    
+    </div> 
   </div>
 </div>
 

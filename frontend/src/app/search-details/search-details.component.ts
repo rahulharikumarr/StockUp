@@ -1,5 +1,3 @@
-// search-details.component.ts
-
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { StockDataService } from '../search.service';
@@ -17,6 +15,8 @@ export class SearchDetailsComponent implements OnInit {
   latestPriceData: any;
   searchQuery: string = '';
   isStarFilled: boolean = false;
+  isMarketOpen: boolean = false;
+  marketClosingTime: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -79,10 +79,30 @@ export class SearchDetailsComponent implements OnInit {
     return `${year}-${month}-${day} 13:00:00`; // Market always closes at 1:00 PM
   }
 
+  formatTimestamp(timestamp: any): string {
+    if (!timestamp) {
+      return 'Unknown'; // Return a default value for null or undefined timestamps
+    }
+  
+    // Convert the provided timestamp to a JavaScript Date object
+    const date = new Date(timestamp * 1000); // Convert from seconds to milliseconds
+  
+    // Extract year, month, day, hours, minutes, and seconds components
+    const year = date.getFullYear();
+    const month = ('0' + (date.getMonth() + 1)).slice(-2);
+    const day = ('0' + date.getDate()).slice(-2);
+    const hours = ('0' + date.getHours()).slice(-2);
+    const minutes = ('0' + date.getMinutes()).slice(-2);
+    const seconds = ('0' + date.getSeconds()).slice(-2);
+  
+    // Return the formatted date and time
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  }
+  
+
   toggleStar(): void {
     this.isStarFilled = !this.isStarFilled;
   }
-  
   
   checkMarketStatus(): void {
     const now = new Date(); // Current date and time
@@ -98,7 +118,7 @@ export class SearchDetailsComponent implements OnInit {
   
     if (currentTimeInMinutes >= marketOpenTime && currentTimeInMinutes <= marketCloseTime) {
       // Market is open
-      this.marketStatus = { isOpen: true };
+      this.isMarketOpen = true;
     } else {
       // Market is closed
       // Calculate the timestamp for the last market close date (yesterday)
@@ -110,7 +130,7 @@ export class SearchDetailsComponent implements OnInit {
       lastCloseDate.setHours(13, 0, 0); // Set hours and minutes to 1:00 PM
   
       // Assign the last close date to marketStatus.closingTime
-      this.marketStatus = { isOpen: false, closingTime: lastCloseDate };
+      this.marketClosingTime = this.formatDate(lastCloseDate);
     }
   }
 }

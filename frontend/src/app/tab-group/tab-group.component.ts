@@ -93,6 +93,10 @@ export class TabGroupComponent implements OnInit {
 
 
   generateChart(): void {
+    // Determine if the market is open
+    const now = new Date();
+    const isMarketOpen = now.getDay() >= 1 && now.getDay() <= 5 && (now.getHours() > 6 || (now.getHours() === 6 && now.getMinutes() >= 30)) && now.getHours() < 13;
+  
     // Fetch historical data for the last working day
     this.stockDataService.getCompanyHistoricalDataLastWorkingDay(this.lastSearchedTicker).subscribe(
       (response: any) => {
@@ -102,36 +106,55 @@ export class TabGroupComponent implements OnInit {
         const historicalData = response.results;
         
         // Extract necessary data for chart
-        const timeLabels = historicalData.map((entry: any) => entry.date); // Assuming dates are used as time labels
+        const timeLabels = historicalData.map((entry: any) => {
+          // Parse timestamp to get hour in the day
+          const date = new Date(entry.t);
+          const hour = date.getHours();
+          const minutes = date.getMinutes();
+          const formattedHour = `${hour < 10 ? '0' + hour : hour}:${minutes < 10 ? '0' + minutes : minutes}`;
+          return formattedHour;
+        });
         const stockPrices = historicalData.map((entry: any) => entry.c); // Assuming 'close' prices are used
         
         console.log('Time Labels:', timeLabels);
         console.log('Stock Prices:', stockPrices);
   
+        // Determine line color based on market open/close status
+        const lineColor = isMarketOpen ? 'green' : 'red';
+  
         // Update chart options with actual data
         this.chartOptions = {
           chart: {
-            type: 'line'
+            type: 'line',
+            scrollablePlotArea: {
+              minWidth: 6* 250,
+              scrollPositionX: 1
+            }
           },
           title: {
-            text: 'Stock Price Variation for the Last Working Day'
+            text: `${this.lastSearchedTicker} Hourly Price Variation`
           },
           xAxis: {
-            categories: timeLabels.reverse(), // Reverse the order to show recent data first
+            categories: timeLabels,
             title: {
               text: 'Time'
-            }
+            },
           },
           yAxis: {
             title: {
-              text: 'Price (USD)'
-            }
+              text: ''
+            },
+            opposite: true 
           },
           series: [{
             type: 'line',
-            name: 'Stock Price',
-            data: stockPrices.reverse() // Reverse the order to match time labels
-          }]
+            name: `${this.lastSearchedTicker}`,
+            color: lineColor,
+            data: stockPrices,
+            marker: {
+                enabled: false
+            }
+        }]
         };
   
         console.log('Chart Options:', this.chartOptions); // Log chart options

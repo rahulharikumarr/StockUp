@@ -46,17 +46,9 @@ export class StockDataService {
 
   // Method to get company historical data
   getCompanyHistoricalDataLastWorkingDay(symbol: string): Observable<any> {
-    // Get today's date
-    const today = new Date();
-  
-    // Get yesterday's date
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-  
     // Construct the HTTP request URL
-    const apiUrl = `${this.apiUrl}/historical?stockTicker=${symbol}&from=${yesterday.toISOString()}&to=${today.toISOString()}&adjusted=true&sort=asc`;
-  
-    // Fetch historical data for the last working day
+    const apiUrl = `${this.apiUrl}/historical?stockTicker=${symbol}`;
+    // Fetch historical data for the last working day from your backend
     return this.http.get<any>(apiUrl);
   }
 }
