@@ -89,29 +89,57 @@ export class TabGroupComponent implements OnInit {
       console.log('Not all data is loaded yet.');
     }
   }
+  
+
 
   generateChart(): void {
-    const seriesData = [10, 20, 30, 40, 50]; // Sample data, replace with actual data
-    this.chartOptions = {
-      chart: {
-        type: 'line'
+    // Fetch historical data for the last working day
+    this.stockDataService.getCompanyHistoricalDataLastWorkingDay(this.lastSearchedTicker).subscribe(
+      (response: any) => {
+        console.log('Historical Data:', response);
+        
+        // Extract results array from response
+        const historicalData = response.results;
+        
+        // Extract necessary data for chart
+        const timeLabels = historicalData.map((entry: any) => entry.date); // Assuming dates are used as time labels
+        const stockPrices = historicalData.map((entry: any) => entry.c); // Assuming 'close' prices are used
+        
+        console.log('Time Labels:', timeLabels);
+        console.log('Stock Prices:', stockPrices);
+  
+        // Update chart options with actual data
+        this.chartOptions = {
+          chart: {
+            type: 'line'
+          },
+          title: {
+            text: 'Stock Price Variation for the Last Working Day'
+          },
+          xAxis: {
+            categories: timeLabels.reverse(), // Reverse the order to show recent data first
+            title: {
+              text: 'Time'
+            }
+          },
+          yAxis: {
+            title: {
+              text: 'Price (USD)'
+            }
+          },
+          series: [{
+            type: 'line',
+            name: 'Stock Price',
+            data: stockPrices.reverse() // Reverse the order to match time labels
+          }]
+        };
+  
+        console.log('Chart Options:', this.chartOptions); // Log chart options
       },
-      title: {
-        text: 'Sample Stock Price History' // Update title
-      },
-      xAxis: {
-        categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May'] // Update categories
-      },
-      yAxis: {
-        title: {
-          text: 'Price (USD)' // Update y-axis title
-        }
-      },
-      series: [{
-        type: 'line',
-        name: 'Stock Price',
-        data: seriesData
-      }]
-    };
+      (error: any) => {
+        console.error('Error fetching historical data:', error);
+      }
+    );
   }
+
 }
