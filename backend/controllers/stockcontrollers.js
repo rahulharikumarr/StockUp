@@ -76,7 +76,7 @@ const getInsiderSentiment = async (req, res) => {
     const { symbol, from } = req.query;
     const apiKey = process.env.FINNHUB_API_KEY;
 
-    const response = await axios.get(`https://finnhub.io/api/v1/stock/insider-sentiment?symbol=${symbol}&from=${from}&token=${apiKey}`);
+    const response = await axios.get(`https://finnhub.io/api/v1/stock/insider-sentiment?symbol=${symbol}&from=2022-01-01&token=${apiKey}`);
     
     res.status(200).json(response.data);
   } catch (error) {

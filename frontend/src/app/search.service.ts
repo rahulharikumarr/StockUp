@@ -58,4 +58,10 @@ export class StockDataService {
     // Fetch historical data for the last two years from your backend
     return this.http.get<any>(apiUrl);
   }
+
+  getInsiderSentiment(symbol: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/insider-sentiment?symbol=${symbol}&from=2022-01-01`);
+  }
+  
+
 }

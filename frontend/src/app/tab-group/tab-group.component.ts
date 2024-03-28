@@ -29,6 +29,7 @@ export class TabGroupComponent implements OnInit {
   companyData: any;
   companyPeers: string[] = [];
   latestPriceData: any;
+  insiderSentimentData: any = {};
   isDataLoaded: boolean = false;
   lastSearchedTicker: string = '';
   Highcharts: typeof Highcharts = Highcharts; // required
@@ -53,6 +54,7 @@ export class TabGroupComponent implements OnInit {
     this.generateChartSMAVolumeByPrice().subscribe((chartOptions: Highcharts.Options) => {
       this.chartOptionsSMAVolumeByPrice = chartOptions;
     });
+    this.fetchInsiderSentimentData();
   }
 
   fetchData(): void {
@@ -102,6 +104,32 @@ export class TabGroupComponent implements OnInit {
     const uniquePeers = peers.filter((peer, index, self) => self.indexOf(peer) === index);
     this.companyPeers = uniquePeers.filter(peer => !peer.includes('.'));
   }
+
+  fetchInsiderSentimentData(): void {
+    const symbol = this.searchResultService.getLastSearchedTicker(); // Get the last searched ticker symbol
+    this.stockDataService.getInsiderSentiment(symbol).subscribe(
+      (data: any) => {
+        this.insiderSentimentData = data; // Assign fetched data to insiderSentimentData object
+      },
+      (error: any) => {
+        console.error('Error fetching insider sentiment data:', error);
+      }
+    );
+  }
+
+// note, to be used in the insights tab
+  calculateTotal(key: string): number {
+    return this.insiderSentimentData.data.reduce((total: number, entry: any) => total + entry[key], 0);
+  }
+
+  calculatePositive(key: string): number {
+    return this.insiderSentimentData.data.filter((entry: any) => entry[key] > 0).reduce((total: number, entry: any) => total + entry[key], 0);
+  }
+
+  calculateNegative(key: string): number {
+    return this.insiderSentimentData.data.filter((entry: any) => entry[key] < 0).reduce((total: number, entry: any) => total + entry[key], 0);
+  }
+
 
   checkDataLoaded(companyDataLoaded: boolean, latestPriceDataLoaded: boolean, companyPeersLoaded: boolean): void {
     if (companyDataLoaded && latestPriceDataLoaded && companyPeersLoaded) {

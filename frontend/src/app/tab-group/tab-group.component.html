@@ -85,11 +85,49 @@
     </ng-template>
   </mat-tab>
 
-  <!-- Insights Tab -->
-  <mat-tab label="Insights">
-    <ng-template matTabContent>
-      <!-- Content for the Insights tab goes here -->
-      <p>Insights Content</p>
-    </ng-template>
-  </mat-tab>
+<!-- Insights Tab -->
+<mat-tab label="Insights">
+  <ng-template matTabContent>
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-9 col-md-10"> <!-- Adjust width for large screens -->
+          <h3 class="text-center mb-4">Insider Sentiments</h3>
+          <div class="table-responsive-sm"> <!-- Make the table more responsive for small screens -->
+            <table class="table table-sm"> <!-- Reduce table size for large screens -->
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Ticker Name</th>
+                  <th>MSPR</th>
+                  <th>Change</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th>Total</th>
+                  <td></td>
+                  <td>{{ calculateTotal('mspr') }}</td>
+                  <td>{{ calculateTotal('change') }}</td>
+                </tr>
+                <tr>
+                  <th>Positive</th>
+                  <td></td>
+                  <td>{{ calculatePositive('mspr') }}</td>
+                  <td>{{ calculatePositive('change') }}</td>
+                </tr>
+                <tr>
+                  <th>Negative</th>
+                  <td></td>
+                  <td>{{ calculateNegative('mspr') }}</td>
+                  <td>{{ calculateNegative('change') }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</mat-tab>
+
 </mat-tab-group>
