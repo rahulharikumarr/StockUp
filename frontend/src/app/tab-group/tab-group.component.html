@@ -90,10 +90,10 @@
   <ng-template matTabContent>
     <div class="container">
       <div class="row justify-content-center">
-        <div class="col-lg-9 col-md-10"> <!-- Adjust width for large screens -->
+        <div class="col-lg-9 col-md-10">
           <h3 class="text-center mb-4">Insider Sentiments</h3>
-          <div class="table-responsive-sm"> <!-- Make the table more responsive for small screens -->
-            <table class="table table-sm"> <!-- Reduce table size for large screens -->
+          <div class="table-responsive-sm">
+            <table class="table table-sm">
               <thead>
                 <tr>
                   <th></th>
@@ -125,9 +125,20 @@
             </table>
           </div>
         </div>
+        <div class="col-lg-6 col-md-6">
+          <div *ngIf="companyRecommendationsChartOptions">
+            <highcharts-chart [Highcharts]="Highcharts" [options]="companyRecommendationsChartOptions"></highcharts-chart>
+          </div>
+        </div>
+        <div class="col-lg-6 col-md-6">
+          <div *ngIf="companyEarningsChartOptions">
+            <highcharts-chart [Highcharts]="Highcharts" [options]="companyEarningsChartOptions"></highcharts-chart>
+          </div>
+        </div>
       </div>
     </div>
   </ng-template>
 </mat-tab>
+
 
 </mat-tab-group>

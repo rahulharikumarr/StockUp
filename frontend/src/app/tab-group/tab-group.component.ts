@@ -8,6 +8,7 @@ import HighchartsStock from 'highcharts/modules/stock';
 import HighchartsExporting from 'highcharts/modules/exporting';
 import HighchartsAccessibility from 'highcharts/modules/accessibility';
 import { catchError } from 'rxjs/operators';
+import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -40,8 +41,10 @@ export class TabGroupComponent implements OnInit {
   oneToOneFlag: boolean = true; // optional boolean, defaults to false
   runOutsideAngular: boolean = false; // optional boolean, defaults to false
   chartOptionsSMAVolumeByPrice: Highcharts.Options = {};
+  companyRecommendationsChartOptions: any;
+  companyEarningsChartOptions: any;
 
-  constructor(private stockDataService: StockDataService, private searchResultService: SearchResultService) {
+  constructor(private stockDataService: StockDataService, private searchResultService: SearchResultService, private route: ActivatedRoute) {
     HighchartsStock(Highcharts);
     HighchartsIndicators(Highcharts);
     HighchartsVbp(Highcharts);
@@ -49,55 +52,90 @@ export class TabGroupComponent implements OnInit {
 
   ngOnInit(): void {
     this.lastSearchedTicker = this.searchResultService.getLastSearchedTicker();
-    console.log('Last Searched Ticker:', this.lastSearchedTicker); // Debugging
     this.fetchData();
     this.generateChartSMAVolumeByPrice().subscribe((chartOptions: Highcharts.Options) => {
       this.chartOptionsSMAVolumeByPrice = chartOptions;
     });
     this.fetchInsiderSentimentData();
+
+    console.log('Calling generateCompanyRecommendationsChart()'); // Check if the function is called
+    this.generateCompanyRecommendationsChart(); // Call the function
+
+    console.log('Calling generateCompanyEarningsChart()'); // Check if the function is called
+    this.generateCompanyEarningsChart(); // Call the function
   }
 
   fetchData(): void {
-    let companyDataLoaded = false;
-    let latestPriceDataLoaded = false;
-    let companyPeersLoaded = false;
-
-    this.stockDataService.getCompanyData(this.lastSearchedTicker).subscribe(
-      (companyData: any) => {
-        console.log('Company Data:', companyData);
-        this.companyData = companyData;
-        companyDataLoaded = true;
-        this.checkDataLoaded(companyDataLoaded, latestPriceDataLoaded, companyPeersLoaded);
-      },
-      (error: any) => {
-        console.error('Error fetching company data:', error);
-      }
-    );
-
-    this.stockDataService.getLatestPrice(this.lastSearchedTicker).subscribe(
-      (latestPriceData: any) => {
-        console.log('Latest Price Data:', latestPriceData);
-        this.latestPriceData = latestPriceData;
-        latestPriceDataLoaded = true;
-        this.checkDataLoaded(companyDataLoaded, latestPriceDataLoaded, companyPeersLoaded);
-      },
-      (error: any) => {
-        console.error('Error fetching latest price data:', error);
-      }
-    );
-
-    this.stockDataService.getCompanyPeers(this.lastSearchedTicker).subscribe(
-      (companyPeers: any[]) => {
-        console.log('Company Peers:', companyPeers);
-        this.fetchPeers(companyPeers);
-        companyPeersLoaded = true;
-        this.checkDataLoaded(companyDataLoaded, latestPriceDataLoaded, companyPeersLoaded);
-      },
-      (error: any) => {
-        console.error('Error fetching company peers:', error);
-      }
-    );
+    // Check if the data is already saved
+    let companyData = this.searchResultService.getSearchResults('companyData');
+    let latestPriceData = this.searchResultService.getSearchResults('latestPriceData');
+    let companyPeers = this.searchResultService.getSearchResults('companyPeers');
+  
+    // If the data is already saved, set the corresponding flags to true
+    let companyDataLoaded = !!companyData;
+    let latestPriceDataLoaded = !!latestPriceData;
+    let companyPeersLoaded = !!companyPeers;
+  
+    // If the data is not saved, fetch it from the backend
+    if (!companyData) {
+      this.stockDataService.getCompanyData(this.lastSearchedTicker).subscribe(
+        (data: any) => {
+          console.log('Company Data:', data);
+          this.companyData = data;
+          this.searchResultService.storeSearchResults('companyData', data); // Save fetched company data
+          companyDataLoaded = true;
+          this.checkDataLoaded(companyDataLoaded, latestPriceDataLoaded, companyPeersLoaded);
+        },
+        (error: any) => {
+          console.error('Error fetching company data:', error);
+        }
+      );
+    } else {
+      // Data is already saved, set the flag to true and check if all data is loaded
+      companyDataLoaded = true;
+      this.checkDataLoaded(companyDataLoaded, latestPriceDataLoaded, companyPeersLoaded);
+    }
+  
+    if (!latestPriceData) {
+      this.stockDataService.getLatestPrice(this.lastSearchedTicker).subscribe(
+        (data: any) => {
+          console.log('Fetching Latest Price Data from API:', data);
+          this.latestPriceData = data;
+          this.searchResultService.storeSearchResults('latestPriceData', data); // Save fetched latest price data
+          latestPriceDataLoaded = true;
+          this.checkDataLoaded(companyDataLoaded, latestPriceDataLoaded, companyPeersLoaded);
+        },
+        (error: any) => {
+          console.error('Error fetching latest price data:', error);
+        }
+      );
+    } else {
+      // Data is already saved, set the flag to true and check if all data is loaded
+      latestPriceDataLoaded = true;
+      this.checkDataLoaded(companyDataLoaded, latestPriceDataLoaded, companyPeersLoaded);
+    }
+  
+    if (!companyPeers) {
+      this.stockDataService.getCompanyPeers(this.lastSearchedTicker).subscribe(
+        (data: any[]) => {
+          console.log('Company Peers:', data);
+          this.fetchPeers(data);
+          this.searchResultService.storeSearchResults('companyPeers', data); // Save fetched company peers data
+          companyPeersLoaded = true;
+          this.checkDataLoaded(companyDataLoaded, latestPriceDataLoaded, companyPeersLoaded);
+        },
+        (error: any) => {
+          console.error('Error fetching company peers:', error);
+        }
+      );
+    } else {
+      // Data is already saved, set the flag to true and check if all data is loaded
+      companyPeersLoaded = true;
+      this.checkDataLoaded(companyDataLoaded, latestPriceDataLoaded, companyPeersLoaded);
+    }
   }
+  
+  
 
   fetchPeers(peers: string[]): void {
     // Remove duplicates
@@ -107,15 +145,69 @@ export class TabGroupComponent implements OnInit {
 
   fetchInsiderSentimentData(): void {
     const symbol = this.searchResultService.getLastSearchedTicker(); // Get the last searched ticker symbol
-    this.stockDataService.getInsiderSentiment(symbol).subscribe(
-      (data: any) => {
-        this.insiderSentimentData = data; // Assign fetched data to insiderSentimentData object
-      },
-      (error: any) => {
-        console.error('Error fetching insider sentiment data:', error);
-      }
-    );
+    
+    // Check if earnings data is already saved
+    let earningsData = this.searchResultService.getSearchResults('earningsData');
+    if (earningsData) {
+      console.log('Retrieved earnings data from cache:', earningsData);
+      // Process the fetched earnings data as needed
+    } else {
+      // Fetch earnings data from the backend
+      this.stockDataService.getEarnings(symbol).subscribe(
+        (data: any) => {
+          console.log('Earnings Data checking if it is there:', data);
+          // Process the fetched earnings data as needed
+          this.searchResultService.storeSearchResults('earningsData', data);
+        },
+        (error: any) => {
+          console.error('Error fetching earnings data:', error);
+        }
+      );
+    }
+  
+    // Similarly check and fetch recommendation trends data
+    // Check if recommendation trends data is already saved
+    let recommendationTrendsData = this.searchResultService.getSearchResults('recommendationTrendsData');
+    if (recommendationTrendsData) {
+      console.log('Retrieved recommendation trends data from cache:', recommendationTrendsData);
+      // Process the fetched recommendation trends data as needed
+    } else {
+      // Fetch recommendation trends data from the backend
+      this.stockDataService.getRecommendationTrends(symbol).subscribe(
+        (data: any) => {
+          console.log('Recommendation Trends Data:', data);
+          // Process the fetched recommendation trends data as needed
+          this.searchResultService.storeSearchResults('recommendationTrendsData', data);
+        },
+        (error: any) => {
+          console.error('Error fetching recommendation trends data:', error);
+        }
+      );
+    }
+  
+    // Finally, fetch insider sentiment data
+    // Check if insider sentiment data is already saved
+    let insiderSentimentData = this.searchResultService.getSearchResults('insiderSentimentData');
+    if (insiderSentimentData) {
+      console.log('Retrieved insider sentiment data from cache:', insiderSentimentData);
+      // Assign fetched data to insiderSentimentData object
+      this.insiderSentimentData = insiderSentimentData;
+    } else {
+      // Fetch insider sentiment data from the backend
+      this.stockDataService.getInsiderSentiment(symbol).subscribe(
+        (data: any) => {
+          console.log('Insider Sentiment Data:', data);
+          // Assign fetched data to insiderSentimentData object
+          this.insiderSentimentData = data;
+          this.searchResultService.storeSearchResults('insiderSentimentData', data);
+        },
+        (error: any) => {
+          console.error('Error fetching insider sentiment data:', error);
+        }
+      );
+    }
   }
+  
 
 // note, to be used in the insights tab
   calculateTotal(key: string): number {
@@ -148,196 +240,431 @@ export class TabGroupComponent implements OnInit {
     const now = new Date();
     const isMarketOpen = now.getDay() >= 1 && now.getDay() <= 5 && (now.getHours() > 6 || (now.getHours() === 6 && now.getMinutes() >= 30)) && now.getHours() < 13;
   
-    // Fetch historical data for the last working day
-    this.stockDataService.getCompanyHistoricalDataLastWorkingDay(this.lastSearchedTicker).subscribe(
-      (response: any) => {
-        
-        // Extract results array from response
-        const historicalData = response.results;
-        
-        // Extract necessary data for chart
-        const timeLabels = historicalData.map((entry: any) => {
-          // Parse timestamp to get hour in the day
-          const date = new Date(entry.t);
-          const hour = date.getHours();
-          const minutes = date.getMinutes();
-          const formattedHour = `${hour < 10 ? '0' + hour : hour}:${minutes < 10 ? '0' + minutes : minutes}`;
-          return formattedHour;
-        });
-        const stockPrices = historicalData.map((entry: any) => entry.c); // Assuming 'close' prices are used
+    // Check if historical data is already stored
+    const historicalData = this.searchResultService.getSearchResults('historicalData');
   
-        // Determine line color based on market open/close status
-        const lineColor = isMarketOpen ? 'green' : 'red';
-  
-        // Update chart options with actual data
-        this.chartOptions = {
-          chart: {
-            type: 'line',
-            scrollablePlotArea: {
-              minWidth: 6* 250,
-              scrollPositionX: 1
-            }
-          },
-          title: {
-            text: `${this.lastSearchedTicker} Hourly Price Variation`
-          },
-          xAxis: {
-            categories: timeLabels,
-            title: {
-              text: 'Time'
-            },
-          },
-          yAxis: {
-            title: {
-              text: ''
-            },
-            opposite: true 
-          },
-          series: [{
-            type: 'line',
-            name: `${this.lastSearchedTicker}`,
-            color: lineColor,
-            data: stockPrices,
-            marker: {
-                enabled: false
-            }
-        }]
-        };
-
-      },
-      (error: any) => {
-        console.error('Error fetching historical data:', error);
-      }
-    );
+    // If historical data is not stored or if it's outdated, fetch it from the backend
+    if (!historicalData) {
+      this.stockDataService.getCompanyHistoricalDataLastWorkingDay(this.lastSearchedTicker).subscribe(
+        (response: any) => {
+          // Extract results array from response
+          const historicalDataFromAPI = response.results;
+          this.updateChartWithData(historicalDataFromAPI, isMarketOpen);
+          // Store fetched historical data
+          this.searchResultService.storeSearchResults('historicalData', historicalDataFromAPI);
+        },
+        (error: any) => {
+          console.error('Error fetching historical data:', error);
+        }
+      );
+    } else {
+      console.log('Using existing data for chart');
+      this.updateChartWithData(historicalData, isMarketOpen);
+    }
   }
+  
+  updateChartWithData(historicalData: any[], isMarketOpen: boolean): void {
+    // Extract necessary data for chart
+    const timeLabels = historicalData.map((entry: any) => {
+      // Parse timestamp to get hour in the day
+      const date = new Date(entry.t);
+      const hour = date.getHours();
+      const minutes = date.getMinutes();
+      const formattedHour = `${hour < 10 ? '0' + hour : hour}:${minutes < 10 ? '0' + minutes : minutes}`;
+      return formattedHour;
+    });
+    const stockPrices = historicalData.map((entry: any) => entry.c); // Assuming 'close' prices are used
+  
+    // Determine line color based on market open/close status
+    const lineColor = isMarketOpen ? 'green' : 'red';
+  
+    // Update chart options with actual data
+    this.chartOptions = {
+      chart: {
+        type: 'line',
+        scrollablePlotArea: {
+          minWidth: 6 * 250,
+          scrollPositionX: 1
+        }
+      },
+      title: {
+        text: `${this.lastSearchedTicker} Hourly Price Variation`
+      },
+      xAxis: {
+        categories: timeLabels,
+        title: {
+          text: 'Time'
+        },
+      },
+      yAxis: {
+        title: {
+          text: ''
+        },
+        opposite: true 
+      },
+      series: [{
+        type: 'line',
+        name: `${this.lastSearchedTicker}`,
+        color: lineColor,
+        data: stockPrices,
+        marker: {
+            enabled: false
+        }
+      }]
+    };
+  }
+
+
 
   generateChartSMAVolumeByPrice(): Observable<Options> {
-    return this.stockDataService.getCompanyHistoricalDataLastTwoYears(this.lastSearchedTicker).pipe(
-      map((response: any) => {
-        const ohlcData = response.results.map((entry: any) => [
-          entry.t, // timestamp
-          entry.o, // open
-          entry.h, // high
-          entry.l, // low
-          entry.c  // close
-        ]);
-  
-        const volumeData = response.results.map((entry: any) => [
-          entry.t, // timestamp
-          entry.v  // volume
-        ]);
-  
-        const options: Options = {
-          rangeSelector: {
-            selected: 2,
-            enabled: true // Ensure range selector is enabled
-          },
-          navigator: {
-            enabled: true // Ensure navigator is enabled
-          },
-          title: {
-            text: 'AAPL Historical'
-          },
-          subtitle: {
-            text: 'With SMA and Volume by Price technical indicators'
-          },
-          yAxis: [{
-            // yAxis configuration for OHLC
-            title: {
-              text: 'OHLC'
-            },
-            opposite: true, // Place yAxis on the right side
-            startOnTick: false,
-            endOnTick: false,
-            labels: {
-              align: 'right',
-              x: -3
-            },
-            height: '60%',
-            lineWidth: 2,
-            resize: {
+    const historicalData = this.searchResultService.getSearchResults('historicalData');
+
+    if (!historicalData) {
+      return this.stockDataService.getCompanyHistoricalDataLastTwoYears(this.lastSearchedTicker).pipe(
+        map((response: any) => {
+          const ohlcData = response.results.map((entry: any) => [
+            entry.t, // timestamp
+            entry.o, // open
+            entry.h, // high
+            entry.l, // low
+            entry.c  // close
+          ]);
+
+          const volumeData = response.results.map((entry: any) => [
+            entry.t, // timestamp
+            entry.v  // volume
+          ]);
+
+          const options: Options = {
+            rangeSelector: {
+              selected: 2,
               enabled: true
-            }
-          }, {
-            // Secondary yAxis configuration for volume
+            },
+            navigator: {
+              enabled: true
+            },
             title: {
-              text: 'Volume'
+              text: 'AAPL Historical'
             },
-            opposite: true, // Place yAxis on the right side
-            top: '65%',
-            height: '35%',
-            offset: 0,
-            lineWidth: 2,
-            labels: {
-              formatter: function () {
-                return (Number(this.value) / 1000000).toFixed(0) + 'M'; // Format y-axis labels in millions
-              }
-            }
-          }],
-          xAxis: {
-            type: 'datetime',
-            labels: {
-              formatter: function () {
-                return Highcharts.dateFormat('%e %b', Number(this.value)); // Default date format
+            subtitle: {
+              text: 'With SMA and Volume by Price technical indicators'
+            },
+            yAxis: [{
+              title: {
+                text: 'OHLC'
               },
-              dateTimeLabelFormats: {
-                month: '%e %b', // Month format for 1Y and All zoom levels
-                year: '%b', // Year format for All zoom level
-                all: '%b \'%y' // Month-year format for All zoom level
+              opposite: true,
+              startOnTick: false,
+              endOnTick: false,
+              labels: {
+                align: 'right',
+                x: -3
+              },
+              height: '60%',
+              lineWidth: 2,
+              resize: {
+                enabled: true
               }
-            } as Highcharts.XAxisLabelsOptions // Add the type assertion here
-          },
-          tooltip: {
-            // Tooltip configuration
-          },
-          plotOptions: {
-            // Plot options configuration
-          },
-          series: [{
-            type: 'candlestick',
-            name: this.lastSearchedTicker,
-            id: 'aapl',
-            zIndex: 2,
-            data: ohlcData,
-            yAxis: 0 // Attach to the first y-axis (OHLC)
-          }, {
-            type: 'column',
-            name: 'Volume',
-            id: 'volume',
-            data: volumeData,
-            yAxis: 1 // Attach to the second y-axis (Volume)
-          }, {
-            type: 'vbp',
-            linkedTo: 'aapl',
-            params: {
-              volumeSeriesID: 'volume'
+            }, {
+              title: {
+                text: 'Volume'
+              },
+              opposite: true,
+              top: '65%',
+              height: '35%',
+              offset: 0,
+              lineWidth: 2,
+              labels: {
+                formatter: function () {
+                  return (Number(this.value) / 1000000).toFixed(0) + 'M';
+                }
+              }
+            }],
+            xAxis: {
+              type: 'datetime',
+              labels: {
+                formatter: function () {
+                  return Highcharts.dateFormat('%e %b', Number(this.value));
+                },
+                dateTimeLabelFormats: {
+                  month: '%e %b',
+                  year: '%b',
+                  all: '%b \'%y'
+                }
+              } as Highcharts.XAxisLabelsOptions // Add the type assertion here
             },
-            dataLabels: {
-              enabled: false
+            series: [{
+              type: 'candlestick',
+              name: this.lastSearchedTicker,
+              id: 'aapl',
+              zIndex: 2,
+              data: ohlcData,
+              yAxis: 0
+            }, {
+              type: 'column',
+              name: 'Volume',
+              id: 'volume',
+              data: volumeData,
+              yAxis: 1
+            }, {
+              type: 'vbp',
+              linkedTo: 'aapl',
+              params: {
+                volumeSeriesID: 'volume'
+              },
+              dataLabels: {
+                enabled: false
+              },
+              zoneLines: {
+                enabled: false
+              }
+            }, {
+              type: 'sma',
+              linkedTo: 'aapl',
+              zIndex: 1,
+              marker: {
+                enabled: false
+              }
+            }]
+          };
+
+          this.searchResultService.storeSearchResults('historicalData', response.results);
+          return options;
+        })
+      );
+    } else {
+      console.log('using existing data for chart 2')
+      const ohlcData = historicalData.map((entry: any) => [
+        entry.t, // timestamp
+        entry.o, // open
+        entry.h, // high
+        entry.l, // low
+        entry.c  // close
+      ]);
+
+      const volumeData = historicalData.map((entry: any) => [
+        entry.t, // timestamp
+        entry.v  // volume
+      ]);
+
+      const options: Options = {
+        rangeSelector: {
+          selected: 2,
+          enabled: true
+        },
+        navigator: {
+          enabled: true
+        },
+        title: {
+          text: 'AAPL Historical'
+        },
+        subtitle: {
+          text: 'With SMA and Volume by Price technical indicators'
+        },
+        yAxis: [{
+          title: {
+            text: 'OHLC'
+          },
+          opposite: true,
+          startOnTick: false,
+          endOnTick: false,
+          labels: {
+            align: 'right',
+            x: -3
+          },
+          height: '60%',
+          lineWidth: 2,
+          resize: {
+            enabled: true
+          }
+        }, {
+          title: {
+            text: 'Volume'
+          },
+          opposite: true,
+          top: '65%',
+          height: '35%',
+          offset: 0,
+          lineWidth: 2,
+          labels: {
+            formatter: function () {
+              return (Number(this.value) / 1000000).toFixed(0) + 'M';
+            }
+          }
+        }],
+        xAxis: {
+          type: 'datetime',
+          labels: {
+            formatter: function () {
+              return Highcharts.dateFormat('%e %b', Number(this.value));
             },
-            zoneLines: {
-              enabled: false
+            dateTimeLabelFormats: {
+              month: '%e %b',
+              year: '%b',
+              all: '%b \'%y'
             }
-          }, {
-            type: 'sma',
-            linkedTo: 'aapl',
-            zIndex: 1,
-            marker: {
-              enabled: false
+          } as Highcharts.XAxisLabelsOptions // Add the type assertion here
+        },
+        series: [{
+          type: 'candlestick',
+          name: this.lastSearchedTicker,
+          id: 'aapl',
+          zIndex: 2,
+          data: ohlcData,
+          yAxis: 0
+        }, {
+          type: 'column',
+          name: 'Volume',
+          id: 'volume',
+          data: volumeData,
+          yAxis: 1
+        }, {
+          type: 'vbp',
+          linkedTo: 'aapl',
+          params: {
+            volumeSeriesID: 'volume'
+          },
+          dataLabels: {
+            enabled: false
+          },
+          zoneLines: {
+            enabled: false
+          }
+        }, {
+          type: 'sma',
+          linkedTo: 'aapl',
+          zIndex: 1,
+          marker: {
+            enabled: false
+          }
+        }]
+      };
+
+      return of(options);
+    }
+  }
+
+  generateCompanyRecommendationsChart(): void {
+    console.log('so the chart 3 function is being called after all');
+    let recommendationData = this.searchResultService.getSearchResults('recommendationTrendsData');
+    console.log('Recommendation Data:', recommendationData);
+
+    if (!recommendationData || recommendationData.length === 0) {
+        // Data not available, fetch it from the backend
+        const symbol = this.searchResultService.getLastSearchedTicker();
+        this.stockDataService.getRecommendationTrends(symbol).subscribe(
+            (data: any) => {
+                console.log('Fetched Recommendation Trends Data:', data);
+                recommendationData = data;
+                this.searchResultService.storeSearchResults('recommendationTrendsData', recommendationData);
+                this.renderRecommendationsChart(recommendationData);
+            },
+            (error: any) => {
+                console.error('Error fetching recommendation trends data:', error);
             }
-          }]
-        };
-  
-        return options;
-      })
-    );
-  }
-  
-  
-  
-  
-  
+        );
+    } else {
+        // Data available, render the chart
+        this.renderRecommendationsChart(recommendationData);
+    }
+}
 
+private renderRecommendationsChart(data: any[]): void {
+  // Generate chart options
+  this.companyRecommendationsChartOptions = {
+    chart: {
+      type: 'column'
+    },
+    title: {
+      text: 'Company Recommendations'
+    },
+    xAxis: {
+      categories: data.map((item: any) => item.period)
+    },
+    yAxis: {
+      title: {
+        text: '#Analysis'
+      },
+      stackLabels: {
+        enabled: true
+      }
+    },
+    tooltip: {
+      headerFormat: '<b>{point.x}</b><br/>',
+      pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
+    },
+    plotOptions: {
+      column: {
+        stacking: 'normal',
+        dataLabels: {
+          enabled: true
+        },
+        colors: ['#5c071e', '#c94b6c', '#91893a', '#60d173', '#103817']
+      }
+    },
+    series: [
+      { name: 'Strong Buy', data: data.map(item => item.strongBuy), color: '#103817' },
+      { name: 'Buy', data: data.map(item => item.buy), color: '#60d173' },
+      { name: 'Hold', data: data.map(item => item.hold), color: '#91893a' },
+      { name: 'Sell', data: data.map(item => item.sell), color: '#c94b6c' },
+      { name: 'Strong Sell', data: data.map(item => item.strongSell), color: '#5c071e' }
+    
+      
+    ]
+  };
+}
 
+generateCompanyEarningsChart(): void {
+    console.log('Fetching and rendering earnings data...');
+    let earningsData = this.searchResultService.getSearchResults('earningsData');
+    console.log('Earnings Data for insights chart is here:', earningsData);
 
-  }
+    if (!earningsData || earningsData.length === 0) {
+        // Data not available, fetch it from the backend
+        const symbol = this.searchResultService.getLastSearchedTicker();
+        this.stockDataService.getEarnings(symbol).subscribe(
+            (data: any) => {
+                console.log('Fetched Earnings Data:', data);
+                earningsData = data;
+                this.searchResultService.storeSearchResults('earningsData', earningsData);
+                this.renderEarningsChart(earningsData);
+            },
+            (error: any) => {
+                console.error('Error fetching earnings data:', error);
+            }
+        );
+    } else {
+        // Data available, render the chart
+        this.renderEarningsChart(earningsData);
+    }
+}
+
+private renderEarningsChart(data: any[]): void {
+    this.companyEarningsChartOptions = {
+        chart: {
+            type: 'spline'
+        },
+        title: {
+            text: 'Company Earnings'
+        },
+        xAxis: {
+            categories: data.map((item: any) => item.period),
+            title: {
+                text: 'Period'
+            }
+        },
+        yAxis: {
+            title: {
+                text: 'Value'
+            }
+        },
+        series: [{
+            name: 'Actual',
+            data: data.map((item: any) => item.actual)
+        }, {
+            name: 'Estimate',
+            data: data.map((item: any) => item.estimate)
+        }]
+    };
+}
+}

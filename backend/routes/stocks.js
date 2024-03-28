@@ -10,7 +10,6 @@ router.get('/historical', stockControllers.getCompanyHistoricalData);
 
 router.get('/historical-last-two-years', stockControllers.getCompanyHistoricalDataLastTwoYears);
 
-
 // Route to get latest stock price
 router.get('/latest-price', stockControllers.getLatestStockPrice);
 
@@ -31,5 +30,8 @@ router.get('/earnings', stockControllers.getCompanyEarnings);
 
 // Route to get market status
 router.get('/market-status', stockControllers.getMarketStatus);
+
+//Route to get recommendation trends
+router.get('/recommendation-trends', stockControllers.getRecommendationTrends);
 
 module.exports = router;

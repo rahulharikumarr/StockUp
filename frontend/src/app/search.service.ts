@@ -62,6 +62,15 @@ export class StockDataService {
   getInsiderSentiment(symbol: string): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/insider-sentiment?symbol=${symbol}&from=2022-01-01`);
   }
-  
 
+  getEarnings(symbol: string): Observable<any> {
+    const url = `${this.apiUrl}/earnings?symbol=${symbol}`;
+    return this.http.get<any>(url);
+  }
+
+  getRecommendationTrends(symbol: string): Observable<any> {
+    const url = `${this.apiUrl}/recommendation-trends?symbol=${symbol}`;
+    return this.http.get<any>(url);
+  }
+  
 }
