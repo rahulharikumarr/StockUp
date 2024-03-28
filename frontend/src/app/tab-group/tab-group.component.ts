@@ -14,9 +14,7 @@ import { map } from 'rxjs/operators';
 import { Options } from 'highcharts';
 import HighchartsIndicators from 'highcharts/indicators/indicators'; // Import the 'highcharts-indicators' module
 import HighchartsVbp from 'highcharts/indicators/volume-by-price';
-
-// ...
-
+import { XAxisLabelsOptions } from 'highcharts';
 
 
 
@@ -187,143 +185,130 @@ export class TabGroupComponent implements OnInit {
 
   generateChartSMAVolumeByPrice(): Observable<Options> {
     return this.stockDataService.getCompanyHistoricalDataLastTwoYears(this.lastSearchedTicker).pipe(
-        map((response: any) => {
-            const ohlcData = response.results.map((entry: any) => [
-                entry.t, // timestamp
-                entry.o, // open
-                entry.h, // high
-                entry.l, // low
-                entry.c  // close
-            ]);
-
-            const volumeData = response.results.map((entry: any) => [
-                entry.t, // timestamp
-                entry.v  // volume
-            ]);
-
-            const options: Options = {
-              chart: {
-                    height: 600 // Increase the height to 600 pixels
-                },
-                rangeSelector: {
-                    enabled: true,
-                    selected: 2,
-                    buttons: [{
-                        type: 'month',
-                        count: 1,
-                        text: '1M'
-                    }, {
-                        type: 'month',
-                        count: 3,
-                        text: '3M'
-                    }, {
-                        type: 'month',
-                        count: 6,
-                        text: '6M'
-                    }, {
-                        type: 'ytd',
-                        text: 'YTD'
-                    }, {
-                        type: 'day',
-                        count: 1,
-                        text: '1D'
-                    }, {
-                        type: 'all',
-                        text: 'All'
-                    }]
-                },
-                navigator: {
-                    enabled: true
-                },
-                title: {
-                    text: `${this.lastSearchedTicker} Historical`
-                },
-                subtitle: {
-                    text: 'With SMA and Volume by Price technical indicators'
-                },
-                yAxis: [{
-                    startOnTick: false,
-                    endOnTick: false,
-                    labels: {
-                        align: 'right',
-                        x: -3
-                    },
-                    title: {
-                        text: 'OHLC'
-                    },
-                    height: '60%',
-                    lineWidth: 2,
-                    resize: {
-                        enabled: true
-                    }
-                }, {
-                    labels: {
-                        align: 'right',
-                        x: -3
-                    },
-                    title: {
-                        text: 'Volume'
-                    },
-                    top: '65%',
-                    height: '35%',
-                    offset: 0,
-                    lineWidth: 2
-                }],
-                tooltip: {
-                    split: true
-                },
-                plotOptions: {
-                    series: {
-                        dataGrouping: {
-                            units: [
-                                ['week', [1]],
-                                ['month', [1, 2, 3, 4, 6]]
-                            ]
-                        }
-                    }
-                },
-                series: [{
-                    type: 'candlestick',
-                    name: `${this.lastSearchedTicker}`,
-                    id: 'aapl',
-                    zIndex: 2,
-                    data: ohlcData
-                }, {
-                    type: 'column',
-                    name: 'Volume',
-                    id: 'volume',
-                    data: volumeData,
-                    yAxis: 1
-                }, {
-                    type: 'vbp',
-                    linkedTo: 'aapl',
-                    params: {
-                        volumeSeriesID: 'volume'
-                    },
-                    dataLabels: {
-                        enabled: false
-                    },
-                    zoneLines: {
-                        enabled: false
-                    }
-                }, {
-                    type: 'sma',
-                    linkedTo: 'aapl',
-                    zIndex: 1,
-                    marker: {
-                        enabled: false
-                    }
-                }]
-            };
-
-            return options;
-        })
+      map((response: any) => {
+        const ohlcData = response.results.map((entry: any) => [
+          entry.t, // timestamp
+          entry.o, // open
+          entry.h, // high
+          entry.l, // low
+          entry.c  // close
+        ]);
+  
+        const volumeData = response.results.map((entry: any) => [
+          entry.t, // timestamp
+          entry.v  // volume
+        ]);
+  
+        const options: Options = {
+          rangeSelector: {
+            selected: 2,
+            enabled: true // Ensure range selector is enabled
+          },
+          navigator: {
+            enabled: true // Ensure navigator is enabled
+          },
+          title: {
+            text: 'AAPL Historical'
+          },
+          subtitle: {
+            text: 'With SMA and Volume by Price technical indicators'
+          },
+          yAxis: [{
+            // yAxis configuration for OHLC
+            title: {
+              text: 'OHLC'
+            },
+            opposite: true, // Place yAxis on the right side
+            startOnTick: false,
+            endOnTick: false,
+            labels: {
+              align: 'right',
+              x: -3
+            },
+            height: '60%',
+            lineWidth: 2,
+            resize: {
+              enabled: true
+            }
+          }, {
+            // Secondary yAxis configuration for volume
+            title: {
+              text: 'Volume'
+            },
+            opposite: true, // Place yAxis on the right side
+            top: '65%',
+            height: '35%',
+            offset: 0,
+            lineWidth: 2,
+            labels: {
+              formatter: function () {
+                return (Number(this.value) / 1000000).toFixed(0) + 'M'; // Format y-axis labels in millions
+              }
+            }
+          }],
+          xAxis: {
+            type: 'datetime',
+            labels: {
+              formatter: function () {
+                return Highcharts.dateFormat('%e %b', Number(this.value)); // Default date format
+              },
+              dateTimeLabelFormats: {
+                month: '%e %b', // Month format for 1Y and All zoom levels
+                year: '%b', // Year format for All zoom level
+                all: '%b \'%y' // Month-year format for All zoom level
+              }
+            } as Highcharts.XAxisLabelsOptions // Add the type assertion here
+          },
+          tooltip: {
+            // Tooltip configuration
+          },
+          plotOptions: {
+            // Plot options configuration
+          },
+          series: [{
+            type: 'candlestick',
+            name: this.lastSearchedTicker,
+            id: 'aapl',
+            zIndex: 2,
+            data: ohlcData,
+            yAxis: 0 // Attach to the first y-axis (OHLC)
+          }, {
+            type: 'column',
+            name: 'Volume',
+            id: 'volume',
+            data: volumeData,
+            yAxis: 1 // Attach to the second y-axis (Volume)
+          }, {
+            type: 'vbp',
+            linkedTo: 'aapl',
+            params: {
+              volumeSeriesID: 'volume'
+            },
+            dataLabels: {
+              enabled: false
+            },
+            zoneLines: {
+              enabled: false
+            }
+          }, {
+            type: 'sma',
+            linkedTo: 'aapl',
+            zIndex: 1,
+            marker: {
+              enabled: false
+            }
+          }]
+        };
+  
+        return options;
+      })
     );
-}
-
-
-
-
+  }
+  
+  
+  
+  
+  
 
 
 
