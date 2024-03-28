@@ -72,5 +72,10 @@ export class StockDataService {
     const url = `${this.apiUrl}/recommendation-trends?symbol=${symbol}`;
     return this.http.get<any>(url);
   }
+
+  getCompanyNews(symbol: string): Observable<any> {
+    const url = `${this.apiUrl}/company-news?symbol=${symbol}`;
+    return this.http.get<any>(url);
+  }
   
 }
