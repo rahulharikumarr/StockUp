@@ -59,13 +59,54 @@
     </ng-template>
   </mat-tab>
 
-  <!-- Top News Tab -->
-  <mat-tab label="Top News">
-    <ng-template matTabContent>
-      <!-- Content for the Top News tab goes here -->
-      <p>Top News Content</p>
+<!-- Top News Tab -->
+<mat-tab label="Top News">
+  <ng-template matTabContent>
+    <div class="container" style="padding-top: 20px;">
+      <div class="row">
+        <div class="col-12">
+          <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-12 mb-4" *ngFor="let newsItem of topNews">
+              <div class="card rounded" (click)="openModal(newsModal, newsItem)">
+                <div class="row g-0">
+                  <div class="col-lg-6 col-md-6 col-sm-12 d-flex justify-content-center align-items-center" style="padding: 10px;">
+                    <img [src]="newsItem.image" class="card-img-top img-fluid rounded" alt="News Image" style="height: 60%; width: 100%;">
+                  </div>
+                  <div class="col-lg-6 col-md-6 col-sm-12">
+                    <div class="card-body d-flex align-items-center justify-content-center" style="height: 100%;">
+                      <h5 class="card-title text-center">{{ newsItem.headline }}</h5>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- News Modal -->
+    <ng-template #newsModal let-modal>
+      <div class="modal-header">
+        <h4 class="modal-title">{{ modal.newsItem.headline }}</h4>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <img [src]="modal.newsItem.image" class="img-fluid mb-3 rounded" alt="News Image">
+        <p>{{ modal.newsItem.summary }}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="shareOnTwitter(modal.newsItem)">Share on Twitter</button>
+        <button type="button" class="btn btn-primary" (click)="shareOnFacebook(modal.newsItem)">Share on Facebook</button>
+        <a href="{{ modal.newsItem.url }}" target="_blank" class="btn btn-link">For more details click here</a>
+      </div>
     </ng-template>
-  </mat-tab>
+  </ng-template>
+</mat-tab>
+
+
+
 
   <!-- Charts Tab -->
   <mat-tab label="Charts">

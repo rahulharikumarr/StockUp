@@ -16,6 +16,7 @@ import { Options } from 'highcharts';
 import HighchartsIndicators from 'highcharts/indicators/indicators'; // Import the 'highcharts-indicators' module
 import HighchartsVbp from 'highcharts/indicators/volume-by-price';
 import { XAxisLabelsOptions } from 'highcharts';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 
 
@@ -31,6 +32,7 @@ export class TabGroupComponent implements OnInit {
   companyPeers: string[] = [];
   latestPriceData: any;
   insiderSentimentData: any = {};
+  topNews: any[] = [];
   isDataLoaded: boolean = false;
   lastSearchedTicker: string = '';
   Highcharts: typeof Highcharts = Highcharts; // required
@@ -44,7 +46,7 @@ export class TabGroupComponent implements OnInit {
   companyRecommendationsChartOptions: any;
   companyEarningsChartOptions: any;
 
-  constructor(private stockDataService: StockDataService, private searchResultService: SearchResultService, private route: ActivatedRoute) {
+  constructor(private stockDataService: StockDataService, private searchResultService: SearchResultService, private route: ActivatedRoute, private modalService: NgbModal) {
     HighchartsStock(Highcharts);
     HighchartsIndicators(Highcharts);
     HighchartsVbp(Highcharts);
@@ -57,6 +59,8 @@ export class TabGroupComponent implements OnInit {
       this.chartOptionsSMAVolumeByPrice = chartOptions;
     });
     this.fetchInsiderSentimentData();
+
+    this.getTopNews(this.lastSearchedTicker);
 
     console.log('Calling generateCompanyRecommendationsChart()'); // Check if the function is called
     this.generateCompanyRecommendationsChart(); // Call the function
@@ -220,6 +224,37 @@ export class TabGroupComponent implements OnInit {
 
   calculateNegative(key: string): number {
     return this.insiderSentimentData.data.filter((entry: any) => entry[key] < 0).reduce((total: number, entry: any) => total + entry[key], 0);
+  }
+
+  getTopNews(symbol: string): void {
+    this.stockDataService.getCompanyNews(symbol).subscribe(
+      (data: any[]) => {
+        const filteredNews = data.filter(newsItem => {
+          return newsItem.image && newsItem.headline && newsItem.url && newsItem.datetime && newsItem.summary && newsItem.source;
+        });
+        this.topNews = filteredNews.slice(0, 20);
+      },
+      (error: any) => {
+        console.error('Error fetching top news:', error);
+      }
+    );
+  }
+
+  openModal(content: any, newsItem: any): void {
+    // Open modal and pass the news item data
+    const modalRef = this.modalService.open(content, { size: 'lg' });
+    modalRef.componentInstance.newsItem = newsItem;
+  }
+
+  shareOnTwitter(newsItem: any): void {
+    const tweetContent = `${newsItem.headline}\n${newsItem.url}`;
+    const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetContent)}`;
+    window.open(tweetUrl, '_blank');
+  }
+
+  shareOnFacebook(newsItem: any): void {
+    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(newsItem.url)}`;
+    window.open(facebookUrl, '_blank');
   }
 
 
