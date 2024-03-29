@@ -18,8 +18,7 @@ import HighchartsVbp from 'highcharts/indicators/volume-by-price';
 import { XAxisLabelsOptions } from 'highcharts';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
-
-
+declare var encodeURIComponent: any;
 
 
 @Component({
@@ -30,9 +29,11 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 export class TabGroupComponent implements OnInit {
   companyData: any;
   companyPeers: string[] = [];
+  newsModal: any;
   latestPriceData: any;
   insiderSentimentData: any = {};
   topNews: any[] = [];
+  newsItem: any;
   isDataLoaded: boolean = false;
   lastSearchedTicker: string = '';
   Highcharts: typeof Highcharts = Highcharts; // required
@@ -138,8 +139,7 @@ export class TabGroupComponent implements OnInit {
       this.checkDataLoaded(companyDataLoaded, latestPriceDataLoaded, companyPeersLoaded);
     }
   }
-  
-  
+
 
   fetchPeers(peers: string[]): void {
     // Remove duplicates
@@ -239,22 +239,22 @@ export class TabGroupComponent implements OnInit {
       }
     );
   }
-
+  
   openModal(content: any, newsItem: any): void {
     // Open modal and pass the news item data
     const modalRef = this.modalService.open(content, { size: 'lg' });
-    modalRef.componentInstance.newsItem = newsItem;
+    this.newsItem = newsItem; // Set the newsItem property
   }
-
+  
   shareOnTwitter(newsItem: any): void {
     const tweetContent = `${newsItem.headline}\n${newsItem.url}`;
     const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetContent)}`;
     window.open(tweetUrl, '_blank');
   }
-
+  
   shareOnFacebook(newsItem: any): void {
     const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(newsItem.url)}`;
-    window.open(facebookUrl, '_blank');
+    window.open(facebookUrl, '_blank')
   }
 
 

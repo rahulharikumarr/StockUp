@@ -87,23 +87,33 @@
     <!-- News Modal -->
     <ng-template #newsModal let-modal>
       <div class="modal-header">
-        <h4 class="modal-title">{{ modal.newsItem.headline }}</h4>
-        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss()">
-          <span aria-hidden="true">&times;</span>
-        </button>
+        <h1 class="modal-title">{{ newsItem?.source }}</h1>
+        <h3 class="modal-subtitle">{{ newsItem?.datetime }}</h3>
+        <hr>
       </div>
       <div class="modal-body">
-        <img [src]="modal.newsItem.image" class="img-fluid mb-3 rounded" alt="News Image">
-        <p>{{ modal.newsItem.summary }}</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary" (click)="shareOnTwitter(modal.newsItem)">Share on Twitter</button>
-        <button type="button" class="btn btn-primary" (click)="shareOnFacebook(modal.newsItem)">Share on Facebook</button>
-        <a href="{{ modal.newsItem.url }}" target="_blank" class="btn btn-link">For more details click here</a>
+        <h2>{{ newsItem?.headline }}</h2>
+        <p>{{ newsItem?.summary }}</p>
+        <p>For more details click <a href="{{ newsItem?.url }}" target="_blank">here</a></p>
+        <hr>
+        <div class="row">
+          <div class="col-12">
+            <h3>Share</h3>
+            <div class="d-flex">
+              <button class="btn btn-link p-0 mr-2" (click)="shareOnTwitter(newsItem)">
+                <i class="bi bi-twitter-x" style="color: black; font-size: 36px;"></i>
+              </button>
+              <button class="btn btn-link p-0" (click)="shareOnFacebook(newsItem)">
+                <i class="bi bi-facebook" style="color: #3b5998; font-size: 36px;"></i>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </ng-template>
   </ng-template>
 </mat-tab>
+
 
 
 
