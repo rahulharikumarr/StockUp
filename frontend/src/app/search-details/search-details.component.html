@@ -1,4 +1,30 @@
 <app-search-bar [query]="searchQuery"></app-search-bar>
+
+
+<!-- Success Alert for Buy -->
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-sm-12 col-md-10 col-lg-8">
+      <!-- Success Alert for Buy -->
+      <div *ngIf="showBuySuccessAlert" class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+        {{ purchasedStock }} bought Successfully
+        <button type="button" class="close" aria-label="Close" (click)="showBuySuccessAlert = false">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <!-- Success Alert for Sell -->
+      <div *ngIf="showSellSuccessAlert" class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+        {{ soldStock }} sold Successfully 
+        <button type="button" class="close" aria-label="Close" (click)="showSellSuccessAlert = false">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Rest of the template -->
 <!-- Success Alert -->
 <div class="container">
   <div class="row justify-content-center">

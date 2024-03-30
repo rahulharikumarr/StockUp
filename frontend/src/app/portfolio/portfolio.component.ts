@@ -16,6 +16,10 @@ export class PortfolioComponent implements OnInit {
   portfolio: any[] = [];
   isLoading: boolean = true;
   walletAmount: number = 0;
+  showBuySuccessAlert: boolean = false;
+  showSellSuccessAlert: boolean = false;
+  purchasedStock: string = '';
+  soldStock: string = '';
   
 
   constructor(private portfolioService: PortfolioService, private modalService: NgbModal, private userService: UserService, private stockDataService: StockDataService) {}
@@ -57,14 +61,41 @@ export class PortfolioComponent implements OnInit {
     const modalRef = this.modalService.open(BuyModalComponent);
     modalRef.componentInstance.ticker = stock.ticker;
     modalRef.componentInstance.currentPrice = stock.currentPrice;
-    modalRef.componentInstance.walletBalance = this.walletAmount ;
+    modalRef.componentInstance.walletBalance = this.walletAmount;
+    modalRef.result.then((result) => {
+      if (result === 'Buy') {
+        this.showBuySuccessAlert = true;
+        this.purchasedStock = stock.ticker;
+        setTimeout(() => {
+          this.showBuySuccessAlert = false;
+          this.purchasedStock = '';
+        }, 5000);
+        this.fetchPortfolio(); // Fetch updated portfolio
+      }
+    }).catch((error) => {
+      console.log('Buy modal dismissed or error:', error);
+    });
   }
-
+  
   openSellModal(stock: any): void {
     const modalRef = this.modalService.open(SellModalComponent);
     modalRef.componentInstance.ticker = stock.ticker;
     modalRef.componentInstance.currentPrice = stock.currentPrice;
     modalRef.componentInstance.userStocksQuantity = stock.quantity;
+    modalRef.componentInstance.walletBalance = this.walletAmount;
+    modalRef.result.then((result) => {
+      if (result === 'Sell') {
+        this.showSellSuccessAlert = true;
+        this.soldStock = stock.ticker;
+        setTimeout(() => {
+          this.showSellSuccessAlert = false;
+          this.soldStock = '';
+        }, 5000);
+        this.fetchPortfolio(); // Fetch updated portfolio
+      }
+    }).catch((error) => {
+      console.log('Sell modal dismissed or error:', error);
+    });
   }
 
   getTotalCostFromPortfolio(ticker: string, portfolio: any[]): number | undefined {

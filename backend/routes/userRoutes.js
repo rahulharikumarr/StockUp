@@ -39,6 +39,7 @@ router.get('/stocks/:ticker', async (req, res) => {
 });
 
 // Route to handle stock purchase
+// Route to handle stock purchase
 router.post('/buy', async (req, res) => {
   try {
     // Retrieve purchase details from request body
@@ -52,11 +53,22 @@ router.post('/buy', async (req, res) => {
     // Calculate total cost of purchase
     const totalCost = quantity * price;
 
-    // Update user's balance in the database
-    await User.findOneAndUpdate({}, { $inc: { balance: -totalCost } });
+    // Find the user
+    const user = await User.findOne();
 
-    // Add purchase to the user's portfolio with total cost
-    await User.findOneAndUpdate({}, { $push: { purchases: { ticker, quantity, price, totalCost } } });
+    // Find the purchase corresponding to the bought stock
+    const purchaseIndex = user.purchases.findIndex(purchase => purchase.ticker === ticker);
+    if (purchaseIndex !== -1) {
+      // If the stock is already in the portfolio, update the existing purchase
+      user.purchases[purchaseIndex].quantity += quantity;
+      user.purchases[purchaseIndex].totalCost += totalCost;
+    } else {
+      // If the stock is not in the portfolio, add it as a new purchase
+      user.purchases.push({ ticker, quantity, price, totalCost });
+    }
+
+    // Update user's balance in the database
+    await user.save();
 
     // Return success response
     res.status(200).json({ message: 'Stock purchased successfully', totalCost });
@@ -66,6 +78,7 @@ router.post('/buy', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
 
 
 

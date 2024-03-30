@@ -20,7 +20,7 @@
             <div class="col-md-6 d-flex">
                 <label for="quantity" class="me-2">Quantity:</label>
                 <input type="number" class="form-control" id="quantity" name="quantity" [(ngModel)]="quantity"
-                    (ngModelChange)="updateTotal()" required>
+        (ngModelChange)="updateTotal()" min="0" required>
             </div>
         </div>
         <div class="modal-footer justify-content-start">

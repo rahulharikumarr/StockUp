@@ -32,6 +32,10 @@ export class SearchDetailsComponent implements OnInit {
   showRemovedAlert: boolean = false;
   walletBalance: number = 0;
   userStocksQuantity: number = 0;
+  showBuySuccessAlert = false;
+  purchasedStock = '';
+  showSellSuccessAlert = false;
+  soldStock = '';
 
 
   @ViewChild('successAlert', { static: false }) successAlert!: NgbAlert;
@@ -194,28 +198,54 @@ fetchWalletBalance(): void {
 }
 
 openBuyModal(): void {
-  // Fetch wallet balance from the user service
   this.userService.getWalletBalance().subscribe(
     walletBalance => {
       const modalRef = this.modalService.open(BuyModalComponent);
       modalRef.componentInstance.ticker = this.ticker;
       modalRef.componentInstance.companyName = this.companyData.name;
       modalRef.componentInstance.currentPrice = this.latestPriceData.pc;
-      modalRef.componentInstance.walletBalance = walletBalance; // Pass the wallet balance
-  
+      modalRef.componentInstance.walletBalance = walletBalance;
+
       modalRef.result.then((result) => {
-        // Handle modal result
-        console.log('Modal result:', result);
+        if (result === 'Buy') {
+          this.showBuySuccessAlert = true;
+          this.purchasedStock = this.ticker;
+          this.fetchUserStocksQuantity();
+          setTimeout(() => {
+            this.showBuySuccessAlert = false;
+            this.purchasedStock = '';
+          }, 5000);
+        }
       }).catch((error) => {
-        // Handle modal dismissal or error
         console.log('Buy modal dismissed or error:', error);
       });
     },
     error => {
       console.error('Error fetching wallet balance:', error);
-      // Optionally, display an error message to the user or handle the error in another way
     }
   );
+}
+
+openSellModal(): void {
+  const modalRef = this.modalService.open(SellModalComponent);
+  modalRef.componentInstance.ticker = this.ticker;
+  modalRef.componentInstance.companyName = this.companyData.name;
+  modalRef.componentInstance.currentPrice = this.latestPriceData.pc;
+  modalRef.componentInstance.userStocksQuantity = this.userStocksQuantity;
+
+  modalRef.result.then((result) => {
+    if (result === 'Sell') {
+      this.showSellSuccessAlert = true;
+      this.soldStock = this.ticker;
+      this.fetchUserStocksQuantity();
+      setTimeout(() => {
+        this.showSellSuccessAlert = false;
+        this.soldStock = '';
+      }, 5000);
+    }
+  }).catch((error) => {
+    console.log('Sell modal dismissed or error:', error);
+  });
 }
 
 
@@ -232,14 +262,7 @@ fetchUserStocksQuantity(): void {
   );
 }
 
-openSellModal(): void {
-  const modalRef = this.modalService.open(SellModalComponent);
-  modalRef.componentInstance.ticker = this.ticker;
-  modalRef.componentInstance.companyName = this.companyData.name;
-  modalRef.componentInstance.currentPrice = this.latestPriceData.pc;
-  modalRef.componentInstance.userStocksQuantity = this.userStocksQuantity; // Pass the user's stock quantity
-  modalRef.componentInstance.walletBalance = this.walletBalance; // Pass the user's wallet balance
-}
+
 
   
   
