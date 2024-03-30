@@ -1,1 +1,43 @@
-<p>portfolio works!</p>
+<div *ngIf="isLoading" class="text-center">Loading...</div>
+
+<div *ngIf="!isLoading && portfolio.length === 0" class="alert alert-warning">Your portfolio is empty.</div>
+
+<div *ngIf="!isLoading && portfolio.length > 0" class="row">
+  <div *ngFor="let stock of portfolio" class="col-md-4 mb-4">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title">{{ stock.ticker }}</h5>
+        <p>{{ stock.companyName }}</p>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col">
+            <p>Quantity: {{ stock.quantity }}</p>
+            <p>Avg. Cost / Share: {{ stock.avgCost | currency:'USD':true }}</p>
+          </div>
+          <div class="col">
+            <p [ngClass]="{'text-success': stock.change > 0, 'text-danger': stock.change < 0, 'text-black': stock.change === 0}">
+              Change: {{ stock.change | currency:'USD':true }}
+            </p>
+            <p [ngClass]="{'text-success': stock.change > 0, 'text-danger': stock.change < 0, 'text-black': stock.change === 0}">
+              Current Price: {{ stock.currentPrice | currency:'USD':true }}
+            </p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <p [ngClass]="{'text-success': stock.change > 0, 'text-danger': stock.change < 0, 'text-black': stock.change === 0}">
+              Market Value: {{ stock.marketValue | currency:'USD':true }}
+            </p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <button class="btn btn-primary" (click)="openBuyModal(stock)">Buy</button>
+            <button class="btn btn-danger" (click)="openSellModal(stock)">Sell</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,7 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { StockDataService } from '../search.service';
 import { SearchResultService } from '../search-results.service';
+import { WatchlistService } from '../watchlist.service';
+import { NgbAlert } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { PortfolioService } from '../portfolio.service';
+import { BuyModalComponent } from '../buy-modal/buy-modal.component';
+import { SellModalComponent } from '../sell-modal/sell-modal.component';
+import { UserService } from '../user.service';
+
+
 
 @Component({
   selector: 'app-search-details',
@@ -17,11 +26,25 @@ export class SearchDetailsComponent implements OnInit {
   isStarFilled: boolean = false;
   isMarketOpen: boolean = false;
   marketClosingTime: string = '';
+  successMessage: string = '';
+  removedMessage: string = '';
+  showSuccessAlert: boolean = false;
+  showRemovedAlert: boolean = false;
+  walletBalance: number = 0;
+  userStocksQuantity: number = 0;
+
+
+  @ViewChild('successAlert', { static: false }) successAlert!: NgbAlert;
+  @ViewChild('removedAlert', { static: false }) removedAlert!: NgbAlert;
 
   constructor(
     private route: ActivatedRoute,
     private stockDataService: StockDataService,
-    private searchResultService: SearchResultService
+    private searchResultService: SearchResultService,
+    private watchlistService: WatchlistService,
+    private modalService: NgbModal,
+    private portfolioService: PortfolioService,
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
@@ -39,10 +62,18 @@ export class SearchDetailsComponent implements OnInit {
         this.loadData();
         console.log('fetched from the backend lol');
       }
+      this.fetchWalletBalance();
+      this.fetchUserStocksQuantity();
     });
 
     // Check market status when component initializes
     this.checkMarketStatus();
+
+    this.watchlistService.getWatchlist().subscribe(watchlist => {
+      const found = watchlist.find(item => item.ticker === this.ticker);
+      this.isStarFilled = !!found;
+    });
+    
   }
 
   loadData(): void {
@@ -98,11 +129,114 @@ export class SearchDetailsComponent implements OnInit {
     // Return the formatted date and time
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   }
+
   
 
   toggleStar(): void {
     this.isStarFilled = !this.isStarFilled;
-  }
+    
+    // Hide any existing alert
+    this.showSuccessAlert = false;
+    this.showRemovedAlert = false;
+
+    if (this.isStarFilled) {
+        // Add the stock to the watchlist
+        this.watchlistService.addToWatchlist({
+            ticker: this.companyData?.ticker,
+            companyName: this.companyData?.name,
+            exchange: this.companyData?.exchange
+        }).subscribe(
+            response => {
+                console.log('Stock added to watchlist:', response);
+                this.successMessage = 'Stock added to watchlist';
+                // Set flag to show success alert
+                this.showSuccessAlert = true;
+                // Hide success alert after 5 seconds
+                setTimeout(() => {
+                    this.showSuccessAlert = false;
+                }, 5000);
+            },
+            error => {
+                console.error('Error adding stock to watchlist:', error);
+                // Handle error, e.g., show an error message to the user
+            }
+        );
+    } else {
+        // Remove the stock from the watchlist using the ticker
+        this.watchlistService.removeFromWatchlist(this.companyData?.ticker).subscribe(
+            response => {
+                console.log('Stock removed from watchlist:', response);
+                this.removedMessage = 'Stock removed from watchlist';
+                // Set flag to show removed alert
+                this.showRemovedAlert = true;
+                // Hide removed alert after 5 seconds
+                setTimeout(() => {
+                    this.showRemovedAlert = false;
+                }, 5000);
+            },
+            error => {
+                console.error('Error removing stock from watchlist:', error);
+                // Handle error, e.g., show an error message to the user
+            }
+        );
+    }
+}
+
+fetchWalletBalance(): void {
+  this.userService.getWalletBalance().subscribe(
+    (response: any) => { // Cast response as any to handle potential changes in API response structure
+      this.walletBalance = response.balance; // Extract balance from the response
+    },
+    error => {
+      console.error('Error fetching wallet balance:', error);
+    }
+  );
+}
+
+openBuyModal(): void {
+  // Fetch wallet balance from the user service
+  this.userService.getWalletBalance().subscribe(walletBalance => {
+    const modalRef = this.modalService.open(BuyModalComponent);
+    modalRef.componentInstance.ticker = this.ticker;
+    modalRef.componentInstance.companyName = this.companyData.name;
+    modalRef.componentInstance.currentPrice = this.latestPriceData.pc;
+    modalRef.componentInstance.walletBalance = walletBalance; // Pass the wallet balance
+
+    modalRef.result.then((result) => {
+      // Handle modal result
+      console.log('Modal result:', result);
+    }).catch((error) => {
+      // Handle modal dismissal or error
+      console.log('Buy modal dismissed or error:', error);
+    });
+  });
+}
+
+
+fetchUserStocksQuantity(): void {
+  // Call a method in the UserService or PortfolioService to get the user's stock quantity
+  // For example, assuming UserService has a method getUserStocksQuantity
+  this.userService.getUserStocksQuantity(this.ticker).subscribe(
+    (quantity: number) => {
+      this.userStocksQuantity = quantity;
+    },
+    error => {
+      console.error('Error fetching user stocks quantity:', error);
+    }
+  );
+}
+
+openSellModal(): void {
+  const modalRef = this.modalService.open(SellModalComponent);
+  modalRef.componentInstance.ticker = this.ticker;
+  modalRef.componentInstance.companyName = this.companyData.name;
+  modalRef.componentInstance.currentPrice = this.latestPriceData.pc;
+  modalRef.componentInstance.userStocksQuantity = this.userStocksQuantity; // Pass the user's stock quantity
+  modalRef.componentInstance.walletBalance = this.walletBalance; // Pass the user's wallet balance
+}
+
+  
+  
   
   checkMarketStatus(): void {
     const now = new Date(); // Current date and time

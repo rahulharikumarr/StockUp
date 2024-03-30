@@ -22,6 +22,11 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { StockDataService } from './search.service';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { CommonModule } from '@angular/common';
+import { WatchlistComponent } from './watchlist/watchlist.component';
+import { BuyModalComponent } from './buy-modal/buy-modal.component';
+import { SellModalComponent } from './sell-modal/sell-modal.component';
+import { PortfolioComponent } from './portfolio/portfolio.component';
 
 
 @NgModule({
@@ -31,7 +36,11 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     HomeComponent,
     AutocompleteComponent,
     SearchDetailsComponent,
-    TabGroupComponent
+    TabGroupComponent,
+    WatchlistComponent,
+    BuyModalComponent,
+    SellModalComponent,
+    PortfolioComponent
   ],
   imports: [
     BrowserModule,
@@ -46,7 +55,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     MatIconModule,
     MatTabsModule,
     HighchartsChartModule,
-    NgbModule
+    NgbModule,
+    CommonModule
   ],
   providers: [AutocompleteService, provideAnimationsAsync(), SearchResultService, StockDataService],
   bootstrap: [AppComponent]

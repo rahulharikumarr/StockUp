@@ -30,3 +30,7 @@
 .green img {
   filter: brightness(0.7);
 }
+
+.star-filled {
+  color: yellow;
+}

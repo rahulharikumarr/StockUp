@@ -1,4 +1,21 @@
 <app-search-bar [query]="searchQuery"></app-search-bar>
+<!-- Success Alert -->
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-sm-12 col-md-10 col-lg-8">
+      <div *ngIf="showSuccessAlert" class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ successMessage }}
+        <button type="button" class="btn-close" aria-label="Close" (click)="showSuccessAlert = false"></button>
+      </div>
+
+      <!-- Removed Alert -->
+      <div *ngIf="showRemovedAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ removedMessage }}
+        <button type="button" class="btn-close" aria-label="Close" (click)="showRemovedAlert = false"></button>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="container">
   <div class="row">
     <!-- First section -->
@@ -6,11 +23,12 @@
       <div class="company-info text-center">
         <h1>
           {{ companyData?.ticker }}
-          <i class="bi" [ngClass]="isStarFilled ? 'bi-star-fill' : 'bi-star'" (click)="toggleStar()"></i>
+          <i class="bi" [ngClass]="isStarFilled ? 'bi-star-fill star-filled' : 'bi-star'" (click)="toggleStar()"></i>
         </h1>
         <h2>{{ companyData?.name }}</h2>
         <p>{{ companyData?.exchange }}</p>
-        <button class="btn btn-success buy-button">Buy</button>
+        <button class="btn btn-success buy-button" (click)="openBuyModal()">Buy</button>
+        <button *ngIf="userStocksQuantity > 0" class="btn btn-danger sell-button" (click)="openSellModal()">Sell</button>
       </div>
     </div>
 
@@ -36,7 +54,8 @@
         <h1>{{ latestPriceData?.pc }}</h1>
         <div class="change-info row align-items-center justify-content-center">
           <div class="col-auto">
-            <img [src]="latestPriceData?.d < 0 ? '../../assets/RedArrowDown.png' : '../../assets/GreenArrowUp.png'" alt="Change Arrow" class="img-fluid arrow">
+            <i class="bi bi-caret-up-fill text-success" [ngStyle]="{'position': 'relative', 'top': '-2px', 'font-size': '1.5em'}" *ngIf="latestPriceData?.d >= 0"></i>
+            <i class="bi bi-caret-down-fill text-danger" [ngStyle]="{'position': 'relative', 'top': '-2px', 'font-size': '1.5em'}" *ngIf="latestPriceData?.d < 0"></i>
           </div>
           <div class="col-auto">
             <h2 class="change-value">{{ latestPriceData?.d }}</h2>
