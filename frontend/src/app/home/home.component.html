@@ -1,7 +1,10 @@
 <div class="container-fluid">
   <div class="row justify-content-center">
     <div class="col-lg-6 col-md-8 col-sm-10 col-12">
-      <app-search-bar [query]="query" (search)="performSearch()"></app-search-bar>
+      <app-search-bar [query]="query" (search)="performSearch()" (validTicker)="handleValidTicker($event)" class="search-bar"></app-search-bar>
+      <div *ngIf="!validTicker" class="alert alert-danger mt-5">
+        No data found. Please enter a valid ticker
+      </div>
       <div *ngIf="searchResults">
         <div *ngFor="let result of searchResults">
           {{ result | json }}

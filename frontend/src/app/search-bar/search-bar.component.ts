@@ -1,8 +1,11 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { AutocompleteService } from '../autocomplete.service'; // Update the path
+import { StockDataService } from '../search.service'; // Update the path
 import { SearchResultService } from '../search-results.service';
+import { Location } from '@angular/common';
+
 
 interface StockSuggestion {
   description: string;
@@ -18,6 +21,7 @@ interface StockSuggestion {
 })
 export class SearchBarComponent implements OnInit {
   @Input() query: string = ''; // Declare query as an input property
+  @Output() validTicker = new EventEmitter<boolean>();
   faMagnifyingGlass = faMagnifyingGlass;
   searchQuery: string = ''; // Add searchQuery property
   suggestions: StockSuggestion[] = [];
@@ -27,7 +31,9 @@ export class SearchBarComponent implements OnInit {
     private autoCompleteService: AutocompleteService,
     private router: Router,
     private route: ActivatedRoute,
-    private searchResultService: SearchResultService // Inject the SearchResultService
+    private location: Location,
+    private stockDataService: StockDataService,
+    private searchResultService: SearchResultService
   ) {}
 
   ngOnInit(): void {
@@ -64,14 +70,33 @@ export class SearchBarComponent implements OnInit {
   }
 
   // Method to perform search and navigate to search/:ticker route
-  search() {
-    if (this.searchQuery.trim() !== '') { // Use searchQuery instead of query
-      // Set the last searched ticker
-      this.searchResultService.setLastSearchedTicker(this.searchQuery.trim());
-      // Redirect to search results page with the entered ticker symbol
-      this.router.navigate(['/search', this.searchQuery.trim()]);
-    }
+// Method to perform search and navigate to search/:ticker route
+search() {
+  if (this.searchQuery.trim() !== '') {
+    this.stockDataService.validateTicker(this.searchQuery.trim()).subscribe(
+      data => {
+        if (Object.keys(data).length === 0) { // Check if the response data is an empty object
+          this.validTicker.emit(false);
+        } else {
+          this.validTicker.emit(true);
+          // Redirect to search results page with the entered ticker symbol
+          this.router.navigate(['/search', this.searchQuery.trim()]);
+          this.searchResultService.setLastSearchedTicker(this.searchQuery.trim());
+        }
+      },
+      error => {
+        console.error(error);
+        this.validTicker.emit(false);
+      }
+    );
   }
+}
+
+clearSearch() {
+  this.searchQuery = ''; // Clear the search query
+  this.location.back(); // Go back to the previous route
+  this.router.navigate(['/search/home']); // Navigate back to the /search/home page
+}
 
   navigateToSymbol(displaySymbol: string): void {
     this.router.navigate(['/search', displaySymbol.trim()]);

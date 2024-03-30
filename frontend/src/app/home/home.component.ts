@@ -9,6 +9,7 @@ import { StockDataService } from '../search.service';
 export class HomeComponent {
   query: string = '';
   searchResults: any[] = [];
+  validTicker: boolean = true;
 
   constructor(private stockDataService: StockDataService) { }
 
@@ -18,17 +19,20 @@ export class HomeComponent {
       this.stockDataService.search(this.query).subscribe(
         results => {
           if (results.length === 0) {
-            alert('No data found. Please enter a valid ticker');
+            this.validTicker = false;
           } else {
             this.searchResults = results;
+            this.validTicker = true;
           }
         },
         error => {
-          alert('No data found. Please enter a valid ticker');
+          this.validTicker = false;
         }
       );
     }
   }
 
-  
+  handleValidTicker(isValid: boolean) {
+    this.validTicker = isValid;
+  }
 }

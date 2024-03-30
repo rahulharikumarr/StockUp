@@ -29,6 +29,10 @@ export class StockDataService {
     return this.http.get<any>(`${this.apiUrl}/profile?symbol=${symbol}`);
   }
 
+  validateTicker(symbol: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/profile?symbol=${symbol}`);
+  }
+
   // Method to get market status
   getMarketStatus(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/market-status?exchange=US`);
