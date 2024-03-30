@@ -1,5 +1,3 @@
-// models/user.js
-
 const mongoose = require('mongoose');
 
 const purchaseSchema = new mongoose.Schema({
@@ -12,6 +10,10 @@ const purchaseSchema = new mongoose.Schema({
     required: true
   },
   price: {
+    type: Number,
+    required: true
+  },
+  totalCost: { // Add totalCost field to the schema
     type: Number,
     required: true
   },

@@ -195,21 +195,27 @@ fetchWalletBalance(): void {
 
 openBuyModal(): void {
   // Fetch wallet balance from the user service
-  this.userService.getWalletBalance().subscribe(walletBalance => {
-    const modalRef = this.modalService.open(BuyModalComponent);
-    modalRef.componentInstance.ticker = this.ticker;
-    modalRef.componentInstance.companyName = this.companyData.name;
-    modalRef.componentInstance.currentPrice = this.latestPriceData.pc;
-    modalRef.componentInstance.walletBalance = walletBalance; // Pass the wallet balance
-
-    modalRef.result.then((result) => {
-      // Handle modal result
-      console.log('Modal result:', result);
-    }).catch((error) => {
-      // Handle modal dismissal or error
-      console.log('Buy modal dismissed or error:', error);
-    });
-  });
+  this.userService.getWalletBalance().subscribe(
+    walletBalance => {
+      const modalRef = this.modalService.open(BuyModalComponent);
+      modalRef.componentInstance.ticker = this.ticker;
+      modalRef.componentInstance.companyName = this.companyData.name;
+      modalRef.componentInstance.currentPrice = this.latestPriceData.pc;
+      modalRef.componentInstance.walletBalance = walletBalance; // Pass the wallet balance
+  
+      modalRef.result.then((result) => {
+        // Handle modal result
+        console.log('Modal result:', result);
+      }).catch((error) => {
+        // Handle modal dismissal or error
+        console.log('Buy modal dismissed or error:', error);
+      });
+    },
+    error => {
+      console.error('Error fetching wallet balance:', error);
+      // Optionally, display an error message to the user or handle the error in another way
+    }
+  );
 }
 
 

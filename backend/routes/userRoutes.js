@@ -45,20 +45,18 @@ router.post('/buy', async (req, res) => {
     const { ticker, quantity, price } = req.body;
 
     // Perform validation on purchase details
-    // Example: Ensure all required fields are provided
     if (!ticker || !quantity || !price) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
-    // Example: Calculate total cost of purchase
+    // Calculate total cost of purchase
     const totalCost = quantity * price;
 
     // Update user's balance in the database
     await User.findOneAndUpdate({}, { $inc: { balance: -totalCost } });
 
-    // Store purchase details in the database
-    const purchase = { ticker, quantity, price };
-    await User.findOneAndUpdate({}, { $push: { purchases: purchase } });
+    // Add purchase to the user's portfolio with total cost
+    await User.findOneAndUpdate({}, { $push: { purchases: { ticker, quantity, price, totalCost } } });
 
     // Return success response
     res.status(200).json({ message: 'Stock purchased successfully', totalCost });
@@ -69,10 +67,11 @@ router.post('/buy', async (req, res) => {
   }
 });
 
+
+
 // Route to handle stock sale
 router.put('/sell', async (req, res) => {
   try {
-    console.log('hmm error is in the backend')
     // Retrieve sale details from request body
     const { ticker, quantity, currentPrice } = req.body;
 
@@ -89,6 +88,9 @@ router.put('/sell', async (req, res) => {
     if (purchaseIndex === -1) {
       return res.status(400).json({ message: 'Stock not found in user\'s portfolio' });
     }
+
+    // Retrieve the total cost of the purchase
+    const totalCost = user.purchases[purchaseIndex].totalCost;
 
     // Calculate the sell amount
     const sellAmount = currentPrice * quantity;
@@ -115,6 +117,7 @@ router.put('/sell', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
 
 router.get('/portfolio', async (req, res) => {
   try {

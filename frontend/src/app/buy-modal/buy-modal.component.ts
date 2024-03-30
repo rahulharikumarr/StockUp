@@ -21,6 +21,8 @@ export class BuyModalComponent {
     this.userService.buyStock(this.ticker, this.quantity, this.currentPrice).subscribe(
       (response) => {
         console.log('Buy operation successful:', response);
+        // Update total cost after purchase
+        this.total = this.currentPrice * this.quantity;
         this.activeModal.close('Buy');
       },
       (error) => {
@@ -29,6 +31,7 @@ export class BuyModalComponent {
       }
     );
   }
+  
 
   dismissModal(): void {
     this.activeModal.dismiss('Dismissed by user');
