@@ -67,7 +67,7 @@
         <div class="col-12">
           <div class="row">
             <div class="col-lg-6 col-md-6 col-sm-12 mb-4" *ngFor="let newsItem of topNews">
-              <div class="card rounded" (click)="openModal(newsModal, newsItem)">
+              <div class="card rounded card-clickable" (click)="openModal(newsModal, newsItem)">
                 <div class="row g-0">
                   <div class="col-lg-6 col-md-6 col-sm-12 d-flex justify-content-center align-items-center" style="padding: 10px;">
                     <img [src]="newsItem.image" class="card-img-top img-fluid rounded" alt="News Image" style="height: 60%; width: 100%;">
@@ -87,8 +87,11 @@
     <!-- News Modal -->
     <ng-template #newsModal let-modal>
       <div class="modal-header">
-        <h1 class="modal-title">{{ newsItem?.source }}</h1>
-        <h3 class="modal-subtitle">{{ newsItem?.datetime }}</h3>
+        <div><h1 class="modal-title">{{ newsItem?.source }}</h1></div>
+        <div><h3 class="modal-subtitle">{{ newsItem?.datetime }}</h3></div>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+          <i class="bi bi-x"></i>
+        </button>
         <hr>
       </div>
       <div class="modal-body">
@@ -135,7 +138,6 @@
       </div>
     </ng-template>
   </mat-tab>
-
 <!-- Insights Tab -->
 <mat-tab label="Insights">
   <ng-template matTabContent>
@@ -144,44 +146,50 @@
         <div class="col-lg-9 col-md-10">
           <h3 class="text-center mb-4">Insider Sentiments</h3>
           <div class="table-responsive-sm">
-            <table class="table table-sm">
-              <thead>
-                <tr>
-                  <th></th>
-                  <th>Ticker Name</th>
-                  <th>MSPR</th>
-                  <th>Change</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th>Total</th>
-                  <td></td>
-                  <td>{{ calculateTotal('mspr') }}</td>
-                  <td>{{ calculateTotal('change') }}</td>
-                </tr>
-                <tr>
-                  <th>Positive</th>
-                  <td></td>
-                  <td>{{ calculatePositive('mspr') }}</td>
-                  <td>{{ calculatePositive('change') }}</td>
-                </tr>
-                <tr>
-                  <th>Negative</th>
-                  <td></td>
-                  <td>{{ calculateNegative('mspr') }}</td>
-                  <td>{{ calculateNegative('change') }}</td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="container">
+              <div class="row">
+                <div class="col-lg-6 col-md-8 col-12 mx-auto">
+                  <table class="table table-sm">
+                    <thead>
+                      <tr>
+                        <th></th>
+                        <th>Ticker Name</th>
+                        <th>MSPR</th>
+                        <th>Change</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <th>Total</th>
+                        <td></td>
+                        <td>{{ calculateTotal('mspr') }}</td>
+                        <td>{{ calculateTotal('change') }}</td>
+                      </tr>
+                      <tr>
+                        <th>Positive</th>
+                        <td></td>
+                        <td>{{ calculatePositive('mspr') }}</td>
+                        <td>{{ calculatePositive('change') }}</td>
+                      </tr>
+                      <tr>
+                        <th>Negative</th>
+                        <td></td>
+                        <td>{{ calculateNegative('mspr') }}</td>
+                        <td>{{ calculateNegative('change') }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="col-lg-6 col-md-6">
+        <div class="col-lg-6 col-md-6 col-sm-12">
           <div *ngIf="companyRecommendationsChartOptions">
             <highcharts-chart [Highcharts]="Highcharts" [options]="companyRecommendationsChartOptions"></highcharts-chart>
           </div>
         </div>
-        <div class="col-lg-6 col-md-6">
+        <div class="col-lg-6 col-md-6 col-sm-12">
           <div *ngIf="companyEarningsChartOptions">
             <highcharts-chart [Highcharts]="Highcharts" [options]="companyEarningsChartOptions"></highcharts-chart>
           </div>
@@ -190,6 +198,4 @@
     </div>
   </ng-template>
 </mat-tab>
-
-
 </mat-tab-group>

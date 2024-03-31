@@ -9,7 +9,9 @@ import { PortfolioService } from '../portfolio.service';
 import { BuyModalComponent } from '../buy-modal/buy-modal.component';
 import { SellModalComponent } from '../sell-modal/sell-modal.component';
 import { UserService } from '../user.service';
-
+import { Router } from '@angular/router';
+import { interval } from 'rxjs';
+import { FooterComponent } from '../footer/footer.component';
 
 
 @Component({
@@ -48,7 +50,8 @@ export class SearchDetailsComponent implements OnInit {
     private watchlistService: WatchlistService,
     private modalService: NgbModal,
     private portfolioService: PortfolioService,
-    private userService: UserService
+    private userService: UserService,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -72,6 +75,13 @@ export class SearchDetailsComponent implements OnInit {
 
     // Check market status when component initializes
     this.checkMarketStatus();
+
+    interval(15000).subscribe(() => {
+      this.checkMarketStatus();
+      if (this.isMarketOpen) {
+        this.loadData();
+      }
+    });
 
     this.watchlistService.getWatchlist().subscribe(watchlist => {
       const found = watchlist.find(item => item.ticker === this.ticker);
@@ -295,5 +305,9 @@ fetchUserStocksQuantity(): void {
       // Assign the last close date to marketStatus.closingTime
       this.marketClosingTime = this.formatDate(lastCloseDate);
     }
+  }
+
+  onClear() {
+    this.router.navigate(['/search/home']);
   }
 }

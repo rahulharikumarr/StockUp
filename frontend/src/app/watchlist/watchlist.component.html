@@ -3,7 +3,7 @@
       <div class="col-lg-8 col-md-8 col-sm-10 mx-auto">
         <h1>My Watchlist</h1>
       </div>
-      <div class="col-lg-8 col-md-8 col-sm-10 card mb-3 mx-auto" *ngFor="let item of watchlist" (click)="navigateToDetails(item.ticker)">
+      <div class="col-lg-8 col-md-8 col-sm-10 card mb-3 mx-auto card-clickable" *ngFor="let item of watchlist" (click)="navigateToDetails(item.ticker)">
         <div class="card-body position-relative">
           <button type="button" class="close position-absolute top-0 start-0 p-2" aria-label="Close" (click)="removeFromWatchlist(item.ticker); $event.stopPropagation();">
             <span aria-hidden="true">&times;</span>
@@ -38,3 +38,4 @@
       <p>No items in watchlist</p>
     </ng-template>
   </div>
+

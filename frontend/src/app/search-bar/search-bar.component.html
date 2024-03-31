@@ -10,7 +10,7 @@
           <input matInput placeholder="Enter stock ticker symbol" [(ngModel)]="searchQuery" (input)="onInputChange()" [matAutocomplete]="auto" (keydown.enter)="search()">
           <mat-autocomplete #auto="matAutocomplete">
             <mat-option *ngIf="isLoading" disabled>
-              <mat-spinner diameter="20"></mat-spinner> <!-- Display spinner if loading -->
+              <mat-spinner diameter="20"></mat-spinner> 
             </mat-option>
             <mat-option *ngFor="let suggestion of suggestions" [value]="suggestion.displaySymbol" (click)="navigateToSymbol(suggestion.displaySymbol)">
               {{ suggestion.displaySymbol }} | {{ suggestion.description }}
@@ -19,7 +19,7 @@
           <button mat-button matSuffix mat-icon-button aria-label="Search" class="search-icon" (click)="search()">
             <fa-icon [icon]="faMagnifyingGlass"></fa-icon>
           </button>
-          <button mat-button matSuffix mat-icon-button aria-label="Clear" (click)="searchQuery = ''">
+          <button mat-button matSuffix mat-icon-button aria-label="Clear" (click)="clearSearch()">
             <mat-icon>close</mat-icon>
           </button>
         </div>

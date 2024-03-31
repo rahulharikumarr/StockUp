@@ -27,6 +27,7 @@ import { WatchlistComponent } from './watchlist/watchlist.component';
 import { BuyModalComponent } from './buy-modal/buy-modal.component';
 import { SellModalComponent } from './sell-modal/sell-modal.component';
 import { PortfolioComponent } from './portfolio/portfolio.component';
+import { FooterComponent } from './footer/footer.component';
 
 
 @NgModule({
@@ -40,7 +41,8 @@ import { PortfolioComponent } from './portfolio/portfolio.component';
     WatchlistComponent,
     BuyModalComponent,
     SellModalComponent,
-    PortfolioComponent
+    PortfolioComponent,
+    FooterComponent
   ],
   imports: [
     BrowserModule,

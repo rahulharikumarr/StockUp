@@ -1,0 +1,8 @@
+.footer {
+  color: black;
+  background-color: #dbdbdb; /* Gray background color */
+  color: #ffffff; /* White text color */
+  text-align: center; /* Center the text */
+  padding: 10px 0; /* Add padding on the top and bottom */
+  margin-top: auto; /* Push the footer to the bottom */
+}

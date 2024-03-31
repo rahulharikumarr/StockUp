@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { StockDataService } from '../search.service';
+import { FooterComponent } from '../footer/footer.component';
 
 @Component({
   selector: 'app-home',
@@ -10,6 +11,7 @@ export class HomeComponent {
   query: string = '';
   searchResults: any[] = [];
   validTicker: boolean = true;
+  showAlert = true; 
 
   constructor(private stockDataService: StockDataService) { }
 
@@ -30,6 +32,10 @@ export class HomeComponent {
         }
       );
     }
+  }
+
+  handleClearClick() {
+    this.validTicker = true;
   }
 
   handleValidTicker(isValid: boolean) {

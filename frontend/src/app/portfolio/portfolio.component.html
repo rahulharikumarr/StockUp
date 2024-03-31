@@ -1,5 +1,5 @@
 <div class="container">
-  <!-- Success Alert for Buy -->
+  
   <div *ngIf="showBuySuccessAlert" class="alert alert-success alert-dismissible fade show mt-3" role="alert">
     Successfully bought {{ purchasedStock }}
     <button type="button" class="close" aria-label="Close" (click)="showBuySuccessAlert = false">
@@ -7,7 +7,7 @@
     </button>
   </div>
   
-  <!-- Success Alert for Sell -->
+  
   <div *ngIf="showSellSuccessAlert" class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
     Successfully sold {{ soldStock }}
     <button type="button" class="close" aria-label="Close" (click)="showSellSuccessAlert = false">
@@ -28,7 +28,7 @@
     </div>
     <div *ngFor="let stock of portfolio" class="row justify-content-center">
       <div class="col-12 col-lg-10 col-xl-9 mb-4">
-        <div class="card bold-text"> <!-- Add the 'bold-text' class here -->
+        <div class="card bold-text"> 
           <div class="card-header">
             <h2 class="card-title">{{ stock.ticker }}</h2>
             <p>{{ stock.companyName }}</p>
@@ -63,7 +63,7 @@
             </div>
             <div class="row">
               <div class="col-12">
-                <hr> <!-- This will create a horizontal line -->
+                <hr> 
                 <button class="btn btn-primary mr-2" (click)="openBuyModal(stock)">Buy</button>
                 <button class="btn btn-danger" (click)="openSellModal(stock)">Sell</button>
               </div>

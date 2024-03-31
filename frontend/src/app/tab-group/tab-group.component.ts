@@ -18,6 +18,7 @@ import HighchartsVbp from 'highcharts/indicators/volume-by-price';
 import { XAxisLabelsOptions } from 'highcharts';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
+
 declare var encodeURIComponent: any;
 
 
@@ -55,17 +56,37 @@ export class TabGroupComponent implements OnInit {
 
   ngOnInit(): void {
     this.lastSearchedTicker = this.searchResultService.getLastSearchedTicker();
-    this.fetchData();
+  
+    // Get stored data
+    this.latestPriceData = this.searchResultService.getSearchResults('latestPriceData');
+    this.companyData = this.searchResultService.getSearchResults('companyData');
+    this.companyPeers = this.searchResultService.getSearchResults('companyPeers');
+    const historicalData = this.searchResultService.getSearchResults('historicalData');
+  
+    // If stored data is not available, fetch it
+    if (!this.latestPriceData || !this.companyData || !this.companyPeers || !historicalData) {
+      this.fetchData();
+    } else {
+      // Assign the data to the component's properties
+      this.latestPriceData = this.latestPriceData;
+      this.companyData = this.companyData;
+      this.companyPeers = this.companyPeers;
+    }
+  
+    // Generate the chart
+    this.generateChart();
+  
     this.generateChartSMAVolumeByPrice().subscribe((chartOptions: Highcharts.Options) => {
       this.chartOptionsSMAVolumeByPrice = chartOptions;
     });
+  
     this.fetchInsiderSentimentData();
-
+  
     this.getTopNews(this.lastSearchedTicker);
-
+  
     console.log('Calling generateCompanyRecommendationsChart()'); // Check if the function is called
     this.generateCompanyRecommendationsChart(); // Call the function
-
+  
     console.log('Calling generateCompanyEarningsChart()'); // Check if the function is called
     this.generateCompanyEarningsChart(); // Call the function
   }
@@ -232,6 +253,14 @@ export class TabGroupComponent implements OnInit {
         const filteredNews = data.filter(newsItem => {
           return newsItem.image && newsItem.headline && newsItem.url && newsItem.datetime && newsItem.summary && newsItem.source;
         });
+  
+        // Convert the datetime values to the desired format
+        filteredNews.forEach(newsItem => {
+          const date = new Date(newsItem.datetime * 1000);
+          const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+          newsItem.datetime = date.toLocaleDateString(undefined, options);
+        });
+  
         this.topNews = filteredNews.slice(0, 20);
       },
       (error: any) => {
@@ -317,6 +346,7 @@ export class TabGroupComponent implements OnInit {
     this.chartOptions = {
       chart: {
         type: 'line',
+        backgroundColor: '#fafafa',
         scrollablePlotArea: {
           minWidth: 6 * 250,
           scrollPositionX: 1
@@ -580,16 +610,12 @@ export class TabGroupComponent implements OnInit {
   }
 
   generateCompanyRecommendationsChart(): void {
-    console.log('so the chart 3 function is being called after all');
     let recommendationData = this.searchResultService.getSearchResults('recommendationTrendsData');
-    console.log('Recommendation Data:', recommendationData);
 
     if (!recommendationData || recommendationData.length === 0) {
-        // Data not available, fetch it from the backend
         const symbol = this.searchResultService.getLastSearchedTicker();
         this.stockDataService.getRecommendationTrends(symbol).subscribe(
             (data: any) => {
-                console.log('Fetched Recommendation Trends Data:', data);
                 recommendationData = data;
                 this.searchResultService.storeSearchResults('recommendationTrendsData', recommendationData);
                 this.renderRecommendationsChart(recommendationData);
@@ -599,7 +625,6 @@ export class TabGroupComponent implements OnInit {
             }
         );
     } else {
-        // Data available, render the chart
         this.renderRecommendationsChart(recommendationData);
     }
 }
@@ -650,28 +675,23 @@ private renderRecommendationsChart(data: any[]): void {
 }
 
 generateCompanyEarningsChart(): void {
-    console.log('Fetching and rendering earnings data...');
-    let earningsData = this.searchResultService.getSearchResults('earningsData');
-    console.log('Earnings Data for insights chart is here:', earningsData);
+  let earningsData = this.searchResultService.getSearchResults('earningsData');
 
-    if (!earningsData || earningsData.length === 0) {
-        // Data not available, fetch it from the backend
-        const symbol = this.searchResultService.getLastSearchedTicker();
-        this.stockDataService.getEarnings(symbol).subscribe(
-            (data: any) => {
-                console.log('Fetched Earnings Data:', data);
-                earningsData = data;
-                this.searchResultService.storeSearchResults('earningsData', earningsData);
-                this.renderEarningsChart(earningsData);
-            },
-            (error: any) => {
-                console.error('Error fetching earnings data:', error);
-            }
-        );
-    } else {
-        // Data available, render the chart
-        this.renderEarningsChart(earningsData);
-    }
+  if (!earningsData || earningsData.length === 0) {
+      const symbol = this.searchResultService.getLastSearchedTicker();
+      this.stockDataService.getEarnings(symbol).subscribe(
+          (data: any) => {
+              earningsData = data;
+              this.searchResultService.storeSearchResults('earningsData', earningsData);
+              this.renderEarningsChart(earningsData);
+          },
+          (error: any) => {
+              console.error('Error fetching earnings data:', error);
+          }
+      );
+  } else {
+      this.renderEarningsChart(earningsData);
+  }
 }
 
 private renderEarningsChart(data: any[]): void {

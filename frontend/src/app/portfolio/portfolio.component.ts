@@ -6,6 +6,7 @@ import { SellModalComponent } from '../sell-modal/sell-modal.component';
 import { NgModule } from '@angular/core';
 import { UserService } from '../user.service';
 import { StockDataService } from '../search.service';
+import { FooterComponent } from '../footer/footer.component';
 
 @Component({
   selector: 'app-portfolio',
@@ -36,7 +37,7 @@ export class PortfolioComponent implements OnInit {
         this.isLoading = false;
         console.log('Portfolio:', this.portfolio);
   
-        // Call calculateValues to calculate additional values for each stock
+        
         this.calculateValues(this.portfolio);
       },
       error => {
@@ -49,7 +50,7 @@ export class PortfolioComponent implements OnInit {
   fetchWalletBalance(): void {
     this.userService.getWalletBalance().subscribe(
       balance => {
-        this.walletAmount = balance; // Assign the balance to walletAmount variable
+        this.walletAmount = balance; // this assings the balance to walletAmount variable
       },
       error => {
         console.error('Error fetching wallet balance:', error);
@@ -70,7 +71,7 @@ export class PortfolioComponent implements OnInit {
           this.showBuySuccessAlert = false;
           this.purchasedStock = '';
         }, 5000);
-        this.fetchPortfolio(); // Fetch updated portfolio
+        this.fetchPortfolio(); 
       }
     }).catch((error) => {
       console.log('Buy modal dismissed or error:', error);
@@ -91,7 +92,7 @@ export class PortfolioComponent implements OnInit {
           this.showSellSuccessAlert = false;
           this.soldStock = '';
         }, 5000);
-        this.fetchPortfolio(); // Fetch updated portfolio
+        this.fetchPortfolio(); 
       }
     }).catch((error) => {
       console.log('Sell modal dismissed or error:', error);
@@ -112,7 +113,7 @@ export class PortfolioComponent implements OnInit {
   }
 
   calculateValues(portfolio: any[]): void {
-  // Iterate over each stock in the portfolio and calculate required values
+  
   portfolio.forEach(stock => {
     // Fetch the latest price asynchronously
     this.stockDataService.getLatestPrice(stock.ticker).subscribe(
@@ -132,7 +133,7 @@ export class PortfolioComponent implements OnInit {
         // Calculate change in price
         stock.change = stock.currentPrice - stock.avgCost;
 
-        // Calculate market value
+        // to Calculate market value
         stock.marketValue = stock.currentPrice * stock.quantity;
       },
       error => {

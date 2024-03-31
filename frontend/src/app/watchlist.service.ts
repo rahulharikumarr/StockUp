@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class WatchlistService {
-  private apiUrl = 'http://localhost:3001/api/watchlist'; // Update with your backend API URL
+  private apiUrl = 'http://localhost:3001/api/watchlist'; 
 
   constructor(private http: HttpClient) { }
 

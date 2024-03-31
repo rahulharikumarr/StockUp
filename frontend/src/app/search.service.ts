@@ -50,16 +50,16 @@ export class StockDataService {
 
   // Method to get company historical data
   getCompanyHistoricalDataLastWorkingDay(symbol: string): Observable<any> {
-    // Construct the HTTP request URL
+
     const apiUrl = `${this.apiUrl}/historical?stockTicker=${symbol}`;
     // Fetch historical data for the last working day from your backend
     return this.http.get<any>(apiUrl);
   }
 
   getCompanyHistoricalDataLastTwoYears(symbol: string): Observable<any> {
-    // Construct the HTTP request URL
+
     const apiUrl = `${this.apiUrl}/historical-last-two-years?stockTicker=${symbol}`;
-    // Fetch historical data for the last two years from your backend
+    // Fetch historical data for the last two years from the backend
     return this.http.get<any>(apiUrl);
   }
 

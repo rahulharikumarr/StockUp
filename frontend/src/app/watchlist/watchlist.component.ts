@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { NgClass } from '@angular/common';
 import { SearchResultService } from '../search-results.service';
 import { StockDataService } from '../search.service';
+import { FooterComponent } from '../footer/footer.component';
 
 
 @Component({
@@ -34,7 +35,7 @@ export class WatchlistComponent implements OnInit {
                 (latestPriceData: any[]) => { 
                   item.latestPriceData = latestPriceData;
                 },
-                (error: any) => { // Explicitly type error as any
+                (error: any) => { 
                   console.error(`Error fetching latest price data for ${item.ticker}:`, error);
                 }
               );
@@ -54,23 +55,24 @@ export class WatchlistComponent implements OnInit {
       },
       error => {
         console.error('Error removing stock from watchlist:', error);
-        // Handle error, e.g., show an error message to the user
+        
       }
     );
   }
   
 
-  navigateToDetails(ticker: string): void {
-    this.router.navigate(['/details', ticker]);
+  navigateToDetails(ticker: string) {
+    console.log(ticker); // log the ticker value
+    this.router.navigate(['/search', ticker]);
   }
 
   getChangeColor(change: number): string {
     if (change > 0) {
-      return 'text-success'; // Green color for positive change
+      return 'text-success';
     } else if (change < 0) {
-      return 'text-danger'; // Red color for negative change
+      return 'text-danger'; 
     } else {
-      return 'text-black'; // Default black color for no change
+      return 'text-black'; 
     }
   }
 }

@@ -22,10 +22,13 @@ interface StockSuggestion {
 export class SearchBarComponent implements OnInit {
   @Input() query: string = ''; // Declare query as an input property
   @Output() validTicker = new EventEmitter<boolean>();
+  @Output() clearClicked = new EventEmitter<void>();
   faMagnifyingGlass = faMagnifyingGlass;
   searchQuery: string = ''; // Add searchQuery property
   suggestions: StockSuggestion[] = [];
   isLoading: boolean = false;
+
+  @Output() clear = new EventEmitter<void>();
 
   constructor(
     private autoCompleteService: AutocompleteService,
@@ -92,10 +95,12 @@ search() {
   }
 }
 
+
+
 clearSearch() {
-  this.searchQuery = ''; // Clear the search query
-  this.location.back(); // Go back to the previous route
-  this.router.navigate(['/search/home']); // Navigate back to the /search/home page
+  this.searchQuery = '';
+  this.clear.emit();
+  this.clearClicked.emit();
 }
 
   navigateToSymbol(displaySymbol: string): void {

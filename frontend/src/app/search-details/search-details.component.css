@@ -4,7 +4,7 @@
 
 .change-info {
   display: flex;
-  align-items: center; /* Align items vertically */
+  align-items: center; 
 }
 /* Colors */
 .green {
@@ -12,8 +12,8 @@
 }
 
 .company-logo img {
-  max-width: 120px; /* Adjust the width as needed */
-  max-height: auto; /* Maintain aspect ratio */
+  max-width: 120px; 
+  max-height: auto; 
 }
 
 
@@ -33,4 +33,8 @@
 
 .star-filled {
   color: yellow;
+}
+
+app-tab-group {
+  padding-bottom: 20px;
 }

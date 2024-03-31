@@ -12,7 +12,7 @@ const routes: Routes = [
   { path: 'search/:ticker', component: SearchDetailsComponent },
   { path: 'watchlist', component: WatchlistComponent },
   { path: 'portfolio', component: PortfolioComponent },
-  { path: '**', redirectTo: '/search/home' } // Redirect to home if route not found
+  { path: '**', redirectTo: '/search/home' } // Redirects to home if route not found
 ];
 
 @NgModule({

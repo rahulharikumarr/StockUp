@@ -1,4 +1,4 @@
-<app-search-bar [query]="searchQuery"></app-search-bar>
+<app-search-bar [query]="searchQuery" (clear)="onClear()"></app-search-bar>
 
 
 <!-- Success Alert for Buy -->
@@ -53,8 +53,8 @@
         </h1>
         <h2>{{ companyData?.name }}</h2>
         <p>{{ companyData?.exchange }}</p>
-        <button class="btn btn-success buy-button" (click)="openBuyModal()">Buy</button>
-        <button *ngIf="userStocksQuantity > 0" class="btn btn-danger sell-button" (click)="openSellModal()">Sell</button>
+        <button class="btn btn-success buy-button mr-2" (click)="openBuyModal()">Buy</button>
+<button *ngIf="userStocksQuantity > 0" class="btn btn-danger sell-button" (click)="openSellModal()">Sell</button>
       </div>
     </div>
 
